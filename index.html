@@ -1,0 +1,1804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="inspoai-v3" name="generator"/>
+<meta content="soft-pastel-studio" name="inspoai-dna"/>
+<meta content="web" name="inspoai-platform"/>
+<meta content="v2" name="inspoai-taste"/>
+<title>Kalakart — no im mean one page for the browse stuff one for add product</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;600;700;800&amp;family=Inter:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config = {"theme":{"extend":{"colors":{"base":"#EDF0EF","surface":"#FFFFFF","raised":"#F5F7F6","line":"#E4E9E7","ink":"#161D1A","muted":"#7C8781","accent":"#3B82F6","accentInk":"#FFFFFF","accent2":"#F4C542"},"fontFamily":{"display":["Inter Tight","sans-serif"],"body":["Inter","sans-serif"],"mono":["IBM Plex Mono","monospace"]},"borderRadius":{"card":"1.125rem"}}}};</script>
+<script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script defer="" src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
+<style>
+  html { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+  body { font-family: 'Inter', sans-serif; background: #EDF0EF; color: #161D1A; }
+  /* Canvas embed: the canvas auto-sizes the iframe to the page's full height,
+  so 100vh sections would balloon with it (measure → grow → re-expand loop).
+  When embedded, pin *-screen sections to a fixed desktop viewport instead. */
+  .v3-embedded .h-screen { height: 900px !important; }
+  .v3-embedded .min-h-screen { min-height: 900px !important; }
+  html, body { overflow-x: hidden; max-width: 100%; }
+  ::selection { background: #3B82F633; }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-thumb { background: #E4E9E7; border-radius: 8px; border: 2px solid #EDF0EF; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  iconify-icon { display: inline-block; vertical-align: middle; }
+  /* Photos must never distort: cover-crop instead of stretch when a sized
+     container disagrees with the image's aspect ratio (browser default is
+     "fill"). Images without forced dimensions are unaffected. */
+  img { object-fit: cover; }
+  [x-cloak] { display: none !important; }
+  input, textarea, select, button { font-family: inherit; }
+  html { scroll-behavior: smooth; }
+  /* Inline text editing (canvas editor only — the shell script arms it when embedded) */
+  .v3-editing { outline: 2px dashed #3B82F6; outline-offset: 3px; border-radius: 4px; cursor: text !important; }
+  /* Scroll-reveal (auto-applied by the shell script below).
+     Taste v2: content is NEVER hidden waiting for a reveal (the anti-slop
+     law's invisible-content trap — a failed observer, a screenshot pass or an
+     export must still show the full page). The motion becomes a settle from a
+     small offset: always readable, never opacity-gated. */
+  @media (prefers-reduced-motion: no-preference) {
+    .v3-reveal { transform: translateY(16px); }
+    .v3-reveal.v3-in { transform: none; transition: transform 0.65s cubic-bezier(0.22,1,0.36,1); }
+    a, button { transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease, opacity 0.18s ease; }
+  }
+  /* One-time confetti burst (auto-armed by [data-confetti] — see script below) */
+  @keyframes v3-confetti-burst {
+    0% { transform: translate(0,0) rotate(0deg) scale(1); opacity: 1; }
+    100% { transform: translate(var(--v3cx), var(--v3cy)) rotate(var(--v3cr)) scale(0.4); opacity: 0; }
+  }
+  .v3-confetti-piece {
+    position: fixed; top: 0; left: 0; width: 8px; height: 8px; pointer-events: none; z-index: 9999;
+    animation: v3-confetti-burst 1.1s cubic-bezier(0.15,0.7,0.3,1) forwards;
+  }
+  /* Shared film-grain texture for the photo treatment layer (lint.js) — one
+     data-URI noise tile, reused via mix-blend-mode + opacity, never
+     regenerated per image. */
+  .v3-grain {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 140px 140px;
+    mix-blend-mode: overlay;
+  }
+</style>
+<script>
+  // Embedded documents (canvas iframes): the canvas auto-sizes the iframe to
+  // the page's full height, so any vh-based sizing would balloon with it
+  // (measure -> grow -> re-expand loop). Pin EVERY vh-derived Tailwind class
+  // to a fixed 900px reference viewport via inline styles (beats everything).
+  // Real tabs (live preview, downloaded code) keep true viewport units.
+  // AI-generated images (pollinations renders on demand) can time out or 502
+  // under burst load: retry once with a cache-buster, then swap to a stock
+  // fallback — a broken-image icon must never ship.
+  document.addEventListener('error', function (e) {
+    var el = e.target;
+    if (!el || el.tagName !== 'IMG' || !el.src) return;
+    var n = +(el.getAttribute('data-v3-retry') || 0);
+    el.setAttribute('data-v3-retry', String(n + 1));
+    if (n < 2) {
+      // 429s need breathing room: 3s, then 8s, staggered per image
+      var src = el.src.replace(/[?&]v3r=d+/, '');
+      var wait = (n === 0 ? 3000 : 8000) + Math.random() * 2000;
+      setTimeout(function () { el.src = src + (src.indexOf('?') > -1 ? '&' : '?') + 'v3r=' + Date.now(); }, wait);
+    } else {
+      var h = 0, s = el.src;
+      for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+      el.src = 'https://picsum.photos/seed/v3' + h + '/1200/900';
+    }
+  }, true);
+
+  window.__v3FixVh = function () {};
+  if (window.self !== window.top) {
+    document.documentElement.classList.add('v3-embedded');
+    window.__v3FixVh = function () {
+      var PX_PER_VH = 9; // 900px reference viewport
+      document.querySelectorAll('[class]').forEach(function (el) {
+        el.classList.forEach(function (c) {
+          var m;
+          if (/^h-(screen|dvh|svh|lvh)$/.test(c)) el.style.setProperty('height', '900px', 'important');
+          else if (/^min-h-(screen|dvh|svh|lvh)$/.test(c)) el.style.setProperty('min-height', '900px', 'important');
+          else if (/^max-h-(screen|dvh|svh|lvh)$/.test(c)) el.style.setProperty('max-height', '900px', 'important');
+          else if ((m = c.match(/^h-[(d+)(?:d|s|l)?vh]$/))) el.style.setProperty('height', (m[1] * PX_PER_VH) + 'px', 'important');
+          else if ((m = c.match(/^min-h-[(d+)(?:d|s|l)?vh]$/))) el.style.setProperty('min-height', (m[1] * PX_PER_VH) + 'px', 'important');
+          else if ((m = c.match(/^max-h-[(d+)(?:d|s|l)?vh]$/))) el.style.setProperty('max-height', (m[1] * PX_PER_VH) + 'px', 'important');
+        });
+        // Inline style="...vh" from the model gets the same treatment
+        var st = el.getAttribute('style');
+        if (st && /d(?:d|s|l)?vh/.test(st)) {
+          el.setAttribute('style', st.replace(/(d+(?:.d+)?)(?:d|s|l)?vh/g, function (_, n) { return (parseFloat(n) * PX_PER_VH) + 'px'; }));
+        }
+      });
+    };
+    addEventListener('DOMContentLoaded', window.__v3FixVh);
+
+    // Inline text editing: double-click any pure-text element to edit it in
+    // place. On commit the new text is posted to the canvas, which patches the
+    // stored document (the live DOM already shows the edit — no reload).
+    var v3EditEl = null, v3EditOrig = '', v3EditOrigHtml = '', v3EditIdx = 0;
+    var v3Norm = function (s) { return String(s || '').replace(/\s+/g, ' ').trim(); };
+    // Editable = text with at most <br> line breaks inside (multi-line
+    // headlines) — anything with real child markup keeps its styling safe.
+    var v3Editable = function (el) {
+      if (!v3Norm(el.textContent)) return false;
+      for (var i = 0; i < el.children.length; i++) {
+        if (el.children[i].tagName !== 'BR') return false;
+      }
+      return true;
+    };
+    function v3EndEdit(commit) {
+      var el = v3EditEl; if (!el) return; v3EditEl = null;
+      el.removeAttribute('contenteditable');
+      el.classList.remove('v3-editing');
+      if (!commit) { el.innerHTML = v3EditOrigHtml; return; }
+      if (el.innerHTML === v3EditOrigHtml) return;
+      parent.postMessage({
+        type: 'v3-edit',
+        tag: el.tagName.toLowerCase(),
+        origText: v3EditOrig,
+        newText: el.textContent,
+        newHtml: el.innerHTML,
+        matchIndex: v3EditIdx
+      }, '*');
+    }
+    document.addEventListener('dblclick', function (e) {
+      var t = e.target && e.target.closest && e.target.closest('h1,h2,h3,h4,h5,h6,p,a,button,span,li,td,th,dt,dd,blockquote,figcaption,label,legend,summary');
+      if (!t || t === v3EditEl) return;
+      if (!v3Editable(t)) return;
+      e.preventDefault(); e.stopPropagation();
+      if (v3EditEl) v3EndEdit(true);
+      v3EditEl = t; v3EditOrig = t.textContent; v3EditOrigHtml = t.innerHTML;
+      // Which duplicate is this? (e.g. two "Learn more" buttons) — lets the
+      // canvas patch the right one in the source document.
+      var same = [].filter.call(document.querySelectorAll(t.tagName), function (n) {
+        return v3Editable(n) && v3Norm(n.textContent) === v3Norm(v3EditOrig);
+      });
+      v3EditIdx = Math.max(0, [].indexOf.call(same, t));
+      try { t.contentEditable = 'plaintext-only'; } catch (_) { t.contentEditable = 'true'; }
+      t.classList.add('v3-editing');
+      t.focus();
+    }, true);
+    document.addEventListener('focusout', function (e) { if (v3EditEl && e.target === v3EditEl) v3EndEdit(true); }, true);
+    document.addEventListener('keydown', function (e) {
+      if (!v3EditEl) return;
+      if (e.key === 'Escape') { e.preventDefault(); v3EndEdit(false); }
+      else if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); v3EditEl.blur(); }
+    }, true);
+    // While editing a link/button, a click must not navigate or toggle anything
+    document.addEventListener('click', function (e) {
+      if (v3EditEl && v3EditEl.contains(e.target)) { e.preventDefault(); e.stopPropagation(); }
+    }, true);
+  }
+  // Live-build channel: the canvas injects streamed body updates without
+  // reloading the document (a reload would re-fetch Tailwind/fonts each time).
+  addEventListener('message', (e) => {
+    if (e.data && e.data.type === 'v3-body' && typeof e.data.html === 'string') {
+      document.body.innerHTML = e.data.html;
+      window.__v3FixVh();
+    } else if (e.data && e.data.type === 'v3-html' && typeof e.data.html === 'string') {
+      try {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(e.data.html, 'text/html');
+        
+        // 1. Update body contents
+        document.body.innerHTML = doc.body.innerHTML;
+        document.body.className = doc.body.className;
+        if (doc.body.style.cssText) {
+          document.body.style.cssText = doc.body.style.cssText;
+        }
+        
+        // 2. Update Tailwind config dynamically
+        const configScript = doc.querySelector('script:not([src])');
+        if (configScript && window.tailwind) {
+          try {
+            const match = configScript.innerHTML.match(/tailwind.configs*=s*([sS]*)/);
+            if (match) {
+              const configObj = new Function('return ' + match[1].trim())();
+              tailwind.config = configObj;
+            }
+          } catch (err) {
+            console.error('Tailwind config re-evaluation failed:', err);
+          }
+        }
+        
+        // 3. Update Google Fonts link
+        const oldFontLink = document.querySelector('link[href*="fonts.googleapis.com"]');
+        const newFontLink = doc.querySelector('link[href*="fonts.googleapis.com"]');
+        if (oldFontLink && newFontLink) {
+          oldFontLink.href = newFontLink.href;
+        }
+        
+        // 4. Update head style tag (scrollbars, selection colors)
+        const oldStyle = document.querySelector('style');
+        const newStyle = doc.querySelector('style');
+        if (oldStyle && newStyle) {
+          oldStyle.innerHTML = newStyle.innerHTML;
+        }
+        window.__v3FixVh();
+      } catch (err) {
+        console.error('v3-html instant retheme failed:', err);
+      }
+    }
+  });
+</script>
+<script>
+  // Framer-motion-style entrance: top-level sections/cards fade-slide in with
+  // a stagger as they scroll into view; on marketing pages each section's own
+  // content (headlines, copy, images, cards) staggers in too. Deterministic —
+  // never model-written.
+  addEventListener('DOMContentLoaded', () => {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    // App chrome (sidebars, navs, tab bars, headers) must NEVER be animated —
+    // only page content. In app shells animate the main column's children;
+    // on marketing pages animate top-level sections.
+    const isAppShell = !!document.querySelector('aside, [class*="h-screen"]');
+    let targets;
+    if (isAppShell) {
+      const main = document.querySelector('main') || document.body;
+      targets = Array.from(main.children).filter(el => !['HEADER', 'NAV', 'ASIDE'].includes(el.tagName));
+      // If main has a single content wrapper, animate its children instead
+      if (targets.length === 1 && targets[0].children.length > 1) targets = Array.from(targets[0].children);
+    } else {
+      const roots = document.querySelectorAll('body > section, body > footer, body > div > section, body > div > footer, main > section');
+      targets = roots.length > 1 ? Array.from(roots) : [];
+    }
+    // Marketing sections: stagger the section's content row-by-row. Descend
+    // through single-wrapper containers to the real content children.
+    const markChildren = (section) => {
+      let root = section;
+      while (root.children.length === 1 && root.children[0].children.length) root = root.children[0];
+      const kids = Array.from(root.children).filter(k => !['SCRIPT', 'STYLE'].includes(k.tagName)).slice(0, 10);
+      if (kids.length < 2) return;
+      kids.forEach((k, i) => {
+        k.classList.add('v3-reveal');
+        k.style.transitionDelay = Math.min(i * 80, 480) + 'ms';
+      });
+    };
+    let order = 0;
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (!e.isIntersecting) continue;
+        const el = e.target;
+        setTimeout(() => {
+          el.classList.add('v3-in');
+          el.querySelectorAll('.v3-reveal').forEach(k => k.classList.add('v3-in'));
+        }, (order++ % 4) * 90);
+        io.unobserve(el);
+      }
+    }, { threshold: 0.08, rootMargin: '0px 0px -6% 0px' });
+    targets.forEach(el => {
+      if (['SCRIPT', 'STYLE', 'NAV', 'ASIDE', 'HEADER'].includes(el.tagName)) return;
+      el.classList.add('v3-reveal');
+      if (!isAppShell) markChildren(el);
+      io.observe(el);
+    });
+    // Safety: anything hidden but already inside the viewport after 1.5s
+    // becomes visible. Below-the-fold content stays armed so the reveal
+    // still plays when the user scrolls to it.
+    setTimeout(() => {
+      document.querySelectorAll('.v3-reveal:not(.v3-in)').forEach(el => {
+        const r = el.getBoundingClientRect();
+        if (r.top < innerHeight && r.bottom > 0) el.classList.add('v3-in');
+      });
+    }, 1500);
+    // Buttery inertia scrolling (Lenis) on marketing pages — app shells keep
+    // native scrolling for their inner panels.
+    if (!isAppShell && document.body.scrollHeight > innerHeight * 1.2) {
+      const s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/lenis@1.3.4/dist/lenis.min.js';
+      s.onload = () => {
+        try {
+          document.documentElement.style.scrollBehavior = 'auto'; // Lenis replaces CSS smooth scroll
+          const lenis = new Lenis({ duration: 1.1, smoothWheel: true, anchors: true });
+          const raf = (t) => { lenis.raf(t); requestAnimationFrame(raf); };
+          requestAnimationFrame(raf);
+        } catch (err) { /* native scrolling still works */ }
+      };
+      document.head.appendChild(s);
+    }
+  });
+</script>
+<script>
+  // One-time confetti burst for celebration/success moments. The model marks
+  // the moment with a bare data-confetti attribute — no JS, no external
+  // library (Lottie/canvas-confetti CDNs are never loaded in this shell and
+  // would render broken/static). Fires exactly once per element, on-brand
+  // colors, self-cleans — never a loop.
+  addEventListener('DOMContentLoaded', () => {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const v3ConfettiColors = ['#3B82F6', '#F4C542', '#3B82F6', '#161D1A'];
+    document.querySelectorAll('[data-confetti]').forEach((el) => {
+      el.removeAttribute('data-confetti');
+      const rect = el.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2, cy = rect.top + rect.height / 2;
+      const pieces = [];
+      const frag = document.createDocumentFragment();
+      for (let i = 0; i < 26; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const dist = 60 + Math.random() * 120;
+        const p = document.createElement('span');
+        p.className = 'v3-confetti-piece';
+        p.style.left = cx + 'px';
+        p.style.top = cy + 'px';
+        p.style.background = v3ConfettiColors[i % v3ConfettiColors.length];
+        p.style.borderRadius = i % 3 === 0 ? '50%' : '2px';
+        p.style.setProperty('--v3cx', Math.cos(angle) * dist + 'px');
+        p.style.setProperty('--v3cy', (Math.sin(angle) * dist - 40) + 'px');
+        p.style.setProperty('--v3cr', (Math.random() * 480 - 240) + 'deg');
+        p.style.animationDelay = (Math.random() * 120) + 'ms';
+        frag.appendChild(p);
+        pieces.push(p);
+      }
+      document.body.appendChild(frag);
+      setTimeout(() => pieces.forEach((p) => p.remove()), 1500);
+    });
+  });
+</script>
+<script>
+  // Selective hero background: a lightweight Canvas2D animated gradient-blob
+  // field (never WebGL/Three.js — deliberately cheap, deterministic, and
+  // impossible for the model to get wrong since it never writes the canvas
+  // code itself). The model only opts a hero section in via a bare
+  // data-hero-canvas attribute; this mounts and animates it in this DNA's
+  // own accent colors. z-index:-1 keeps it behind normal in-flow content
+  // without needing to touch the model's own markup.
+  addEventListener('DOMContentLoaded', () => {
+    const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const heroColors = ['#3B82F6', '#F4C542', '#3B82F6'];
+    document.querySelectorAll('[data-hero-canvas]').forEach((el) => {
+      el.removeAttribute('data-hero-canvas');
+      if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
+      const canvas = document.createElement('canvas');
+      canvas.style.cssText = 'position:absolute;inset:0;z-index:-1;pointer-events:none;filter:blur(60px);';
+      el.prepend(canvas);
+      const ctx = canvas.getContext('2d');
+      const dpr = Math.min(devicePixelRatio || 1, 2);
+      function resize() {
+        canvas.width = Math.max(1, el.clientWidth * dpr);
+        canvas.height = Math.max(1, el.clientHeight * dpr);
+        canvas.style.width = el.clientWidth + 'px';
+        canvas.style.height = el.clientHeight + 'px';
+      }
+      resize();
+      addEventListener('resize', resize);
+      const blobs = heroColors.map(() => ({
+        color: heroColors[Math.floor(Math.random() * heroColors.length)],
+        baseX: 0.2 + Math.random() * 0.6,
+        baseY: 0.2 + Math.random() * 0.6,
+        r: 0.32 + Math.random() * 0.22,
+        speed: 0.00012 + Math.random() * 0.00008,
+        phase: Math.random() * Math.PI * 2,
+        driftX: 0.12 + Math.random() * 0.08,
+        driftY: 0.10 + Math.random() * 0.06
+      }));
+      function paint(t) {
+        const w = canvas.width, h = canvas.height;
+        if (!w || !h) return;
+        ctx.clearRect(0, 0, w, h);
+        blobs.forEach((b) => {
+          const x = (b.baseX + Math.sin(t * b.speed + b.phase) * b.driftX) * w;
+          const y = (b.baseY + Math.cos(t * b.speed * 0.8 + b.phase) * b.driftY) * h;
+          const r = b.r * Math.max(w, h);
+          const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+          g.addColorStop(0, b.color + '55');
+          g.addColorStop(1, b.color + '00');
+          ctx.fillStyle = g;
+          ctx.beginPath();
+          ctx.arc(x, y, r, 0, Math.PI * 2);
+          ctx.fill();
+        });
+      }
+      if (reduceMotion) {
+        paint(0);
+      } else {
+        const loop = (t) => { paint(t); requestAnimationFrame(loop); };
+        requestAnimationFrame(loop);
+      }
+    });
+  });
+</script>
+</head>
+<body class="font-body" x-data="kalakartApp()" x-init="initApp()" @refresh-dashboard.window="refreshDashboard()">
+
+<div class="fixed right-3 top-3 z-[999] flex items-center gap-1 rounded-full border border-line bg-surface/95 p-1 text-xs font-medium text-muted shadow-[0_4px_16px_rgba(22,29,26,0.12)] backdrop-blur-sm">
+  <button @click="page = 'login'; authMode = 'login'" :class="page === 'login' ? 'bg-accent text-accentInk' : 'hover:bg-raised hover:text-ink'" class="rounded-full px-3 py-1.5 transition-colors">Login</button>
+  <button @click="page = 'browse'" :class="(page === 'browse' || page === 'product-detail' || page === 'order-confirmation') ? 'bg-accent text-accentInk' : 'hover:bg-raised hover:text-ink'" class="rounded-full px-3 py-1.5 transition-colors">Buyer app</button>
+  <button x-show="user" @click="openMessages()" :class="page === 'messages' ? 'bg-accent text-accentInk' : 'hover:bg-raised hover:text-ink'" class="rounded-full px-3 py-1.5 transition-colors"><iconify-icon icon="lucide:message-circle"></iconify-icon> Messages</button>
+  <button @click="openDashboard()" :class="page === 'dashboard' ? 'bg-accent text-accentInk' : 'hover:bg-raised hover:text-ink'" class="rounded-full px-3 py-1.5 transition-colors">Seller dashboard</button>
+</div>
+
+<template x-if="page === 'login'"><div>
+<div class="min-h-screen bg-base">
+<div class="grid min-h-screen lg:grid-cols-2">
+<!-- ── LEFT: hero panel ───────────────────────────────── -->
+<div class="relative hidden overflow-hidden bg-ink lg:block">
+<div class="v3-photo relative overflow-hidden h-full w-full"><img alt="Lakshmi Devi hand-finishing a brass diya in her workshop near Thanjavur." class="absolute inset-0 h-full w-full object-cover" src="https://images.unsplash.com/photo-1785482449272-b43450f4c5b2?ixid=M3w5NDA1NDZ8MHwxfHNlYXJjaHwxfHx3b21hbiUyMGFydGlzYW4lMjB3b3JraW5nJTIwaW4lMjBjcmFmdCUyMHdvcmtzaG9wfGVufDF8MHx8fDE3OTAxMzcwODd8MA&amp;ixlib=rb-4.1.0&amp;w=1200&amp;q=80&amp;fm=jpg&amp;fit=crop"/><div class="pointer-events-none absolute inset-0" style="background:linear-gradient(160deg,rgba(244,197,66,0.16) 0%,transparent 100%)"></div><div class="v3-grain pointer-events-none absolute inset-0" style="opacity:0.03"></div></div>
+<div class="absolute inset-0 bg-gradient-to-t from-ink via-ink/55 to-ink/10"></div>
+<div class="relative flex h-full flex-col justify-between p-10 xl:p-12">
+<div class="flex items-center gap-3">
+<span class="grid h-10 w-10 place-items-center rounded-card bg-white/95 font-display text-lg font-bold text-ink">K</span>
+<span class="font-display text-lg font-semibold tracking-tight text-white">Kalakart</span>
+</div>
+<div class="max-w-md">
+<h1 class="font-display text-4xl leading-[1.08] tracking-tight text-white xl:text-[2.75rem]">
+            Handmade goods, sold by the people who make them
+          </h1>
+<p class="mt-5 text-[15px] leading-relaxed text-white/75">
+            Kalakart connects rural and semi-urban artisans with buyers who care where a product comes from.
+          </p>
+<div class="mt-8 flex items-center gap-3 rounded-card border border-white/15 bg-white/10 p-3 backdrop-blur-sm">
+<span class="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-white/15 text-white">
+<iconify-icon icon="lucide:mic"></iconify-icon>
+</span>
+<p class="text-xs leading-relaxed text-white/80">
+              Lakshmi Devi hand-finishing a brass diya in her workshop near Thanjavur.
+            </p>
+</div>
+</div>
+<div class="flex items-center gap-6 text-xs text-white/60">
+<span class="flex items-center gap-2">
+<iconify-icon icon="lucide:map-pin"></iconify-icon> 4,200+ artisans
+          </span>
+<span class="flex items-center gap-2">
+<iconify-icon icon="lucide:languages"></iconify-icon> 11 languages
+          </span>
+</div>
+</div>
+</div>
+<!-- ── RIGHT: form column ─────────────────────────────── -->
+<div class="flex items-center justify-center px-6 py-12 sm:px-10 lg:py-16">
+<div class="w-full max-w-md" x-data="{ showPw: false }">
+<!-- mobile wordmark (sidebar hidden below lg) -->
+<div class="mb-8 flex items-center gap-3 lg:hidden">
+<span class="grid h-9 w-9 place-items-center rounded-card bg-ink font-display text-base font-bold text-white">K</span>
+<span class="font-display text-base font-semibold tracking-tight text-ink">Kalakart</span>
+</div>
+<h2 class="font-display text-3xl tracking-tight text-ink">Welcome to Kalakart</h2>
+<p class="mt-2 text-sm text-muted">Sign in or create an account to continue.</p>
+<!-- Role selector -->
+<div class="mt-8">
+<p class="text-sm font-medium text-ink">How will you use Kalakart?</p>
+<div class="mt-3 grid gap-3 sm:grid-cols-2">
+<!-- Artisan card -->
+<button :class="role === 'artisan' ? 'border-accent bg-accent/5' : 'border-line bg-surface hover:border-ink/20'" @click="role = 'artisan'; authError = ''" class="relative flex flex-col rounded-card border p-4 text-left transition-colors" type="button">
+<div class="flex items-start justify-between">
+<span class="grid h-9 w-9 place-items-center rounded-xl bg-blue-50 text-blue-500">
+<iconify-icon icon="lucide:hammer"></iconify-icon>
+</span>
+<span class="rounded-full bg-accent px-2 py-0.5 text-[10px] font-semibold text-accentInk" x-show="role === 'artisan'" x-transition.opacity="">Selected</span>
+</div>
+<p class="mt-3 text-sm font-semibold text-ink">I make products</p>
+<p class="mt-1 text-xs leading-relaxed text-muted">List your crafts by voice. AI helps with the writing, while you stay in control of the final listing.</p>
+</button>
+<!-- Buyer card -->
+<button :class="role === 'buyer' ? 'border-accent bg-accent/5' : 'border-line bg-surface hover:border-ink/20'" @click="role = 'buyer'; authError = ''" class="relative flex flex-col rounded-card border p-4 text-left transition-colors" type="button">
+<div class="flex items-start justify-between">
+<span class="grid h-9 w-9 place-items-center rounded-xl bg-violet-50 text-violet-500">
+<iconify-icon icon="lucide:shopping-bag"></iconify-icon>
+</span>
+<span class="rounded-full bg-accent px-2 py-0.5 text-[10px] font-semibold text-accentInk" x-show="role === 'buyer'" x-transition.opacity="">Selected</span>
+</div>
+<p class="mt-3 text-sm font-semibold text-ink">I want to buy</p>
+<p class="mt-1 text-xs leading-relaxed text-muted">Browse handmade goods direct from artisans across India.</p>
+</button>
+</div>
+<p class="mt-2.5 flex items-center gap-1.5 text-xs text-red-500" x-show="authError === 'norole'" x-transition.opacity="">
+<iconify-icon icon="lucide:alert-circle"></iconify-icon>
+            Pick one option above to continue.
+          </p>
+</div>
+<!-- Credentials -->
+<div class="mb-4 grid gap-1.5" x-show="authMode === 'register'"><label class="text-sm font-medium text-ink">Your name</label><input class="rounded-card border border-line bg-surface px-3.5 py-2.5 text-sm outline-none focus:border-accent" placeholder="Your name" x-model="name" type="text"/></div><div class="mt-6 space-y-4">
+<div class="grid gap-1.5">
+<label class="text-sm font-medium text-ink">Email address</label>
+<input :class="authError === 'email' ? 'border-red-300 focus:border-red-400' : 'border-line focus:border-accent'" @input="authError = ''" class="rounded-card border bg-surface px-3.5 py-2.5 text-sm text-ink outline-none transition-colors placeholder:text-muted/70" placeholder="you@example.com" type="email" x-model="email"/>
+<p class="flex items-center gap-1.5 text-xs text-red-500" x-show="authError === 'email'" x-transition.opacity="">
+<iconify-icon icon="lucide:alert-circle"></iconify-icon>
+              Enter an email address in the format name@example.com
+            </p>
+</div>
+<div class="grid gap-1.5">
+<div class="flex items-center justify-between">
+<label class="text-sm font-medium text-ink">Password</label>
+<a class="text-xs font-medium text-muted transition-colors hover:text-ink" href="#">Forgot password?</a>
+</div>
+<div class="relative">
+<input :class="authError === 'password' ? 'border-red-300 focus:border-red-400' : 'border-line focus:border-accent'" :type="showPw ? 'text' : 'password'" @input="authError = ''" class="w-full rounded-card border bg-surface px-3.5 py-2.5 pr-16 text-sm text-ink outline-none transition-colors placeholder:text-muted/70" placeholder="At least 8 characters" x-model="password"/>
+<button @click="showPw = !showPw" class="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg px-2.5 py-1 text-xs font-medium text-muted transition-colors hover:bg-raised hover:text-ink" type="button" x-text="showPw ? 'Hide' : 'Show'"></button>
+</div>
+<p class="flex items-center gap-1.5 text-xs text-red-500" x-show="authError === 'password'" x-transition.opacity="">
+<iconify-icon icon="lucide:alert-circle"></iconify-icon>
+              Enter your password to continue.
+            </p>
+</div>
+</div>
+<!-- Continue -->
+<p x-show="authError && !['norole','email','password'].includes(authError)" x-text="authError" class="mt-3 rounded-card bg-red-50 px-3 py-2 text-xs text-red-700"></p>
+<button @click="authMode === 'login' ? login() : register()" class="mt-6 w-full rounded-card bg-accent py-3 text-sm font-semibold text-accentInk shadow-[0_1px_2px_rgba(22,29,26,0.10),0_4px_4px_rgba(22,29,26,0.09),0_9px_6px_rgba(22,29,26,0.05),0_17px_7px_rgba(22,29,26,0.01),inset_0_2px_8px_rgba(255,255,255,0.6)] transition-colors hover:bg-accent/90" type="button" x-text="authMode === 'login' ? 'Continue' : 'Create account'"></button>
+<p class="mt-4 text-center text-sm text-muted">
+<button @click="authMode = authMode === 'login' ? 'register' : 'login'; authError=''" class="font-medium text-ink underline decoration-line underline-offset-4 transition-colors hover:decoration-ink" type="button" x-text="authMode === 'login' ? 'Create an account' : 'Back to sign in'"></button>
+</p>
+<!-- Trust strip -->
+<div class="mt-8 rounded-card border border-line bg-raised px-4 py-3">
+<p class="text-center text-xs leading-relaxed text-muted">
+            Voice-first listing <span class="mx-1.5 text-muted/50">•</span> AI listing help <span class="mx-1.5 text-muted/50">•</span> No tech skills needed
+          </p>
+</div>
+<p class="mt-5 text-center text-[11px] leading-relaxed text-muted/80">
+          By continuing you agree to the Kalakart Terms of Use and Privacy Policy.
+        </p>
+</div>
+</div>
+</div>
+</div>
+</div></template>
+<template x-if="page === 'browse'"><div>
+<div class="min-h-screen bg-base font-body text-ink" x-data="{ 
+  voiceState: 'idle',
+  activeCategory: 'All',
+  sortOpen: false,
+  sortValue: 'Newest first',
+  showEmpty: false,
+  filters: []
+}">
+<!-- Page header -->
+<div class="mx-auto max-w-7xl px-8 pt-8 pb-4">
+<div class="flex items-center justify-between gap-6">
+<div>
+<h1 class="font-display text-xl font-semibold tracking-tight text-ink">Browse</h1>
+<p class="mt-1 text-sm text-muted"><span x-text="products.length"></span> products currently listed in the marketplace</p>
+</div>
+<div class="flex items-center gap-3">
+<button @click="startMarketplaceVoiceSearch()" class="flex items-center gap-2 rounded-card border border-line bg-surface px-4 py-2.5 text-sm font-medium text-muted transition-colors hover:border-ink/20 hover:text-ink">
+<iconify-icon class="text-base" icon="lucide:mic"></iconify-icon>
+          Search by voice
+        </button>
+</div>
+</div>
+</div>
+<!-- Search bar -->
+<div class="mx-auto max-w-7xl px-8 pb-5">
+<div class="relative">
+<div class="flex items-center gap-3 rounded-card border border-line bg-surface px-4 py-3 shadow-[0_1px_2px_rgba(22,29,26,0.05),0_1px_1px_rgba(22,29,26,0.03)]">
+<iconify-icon class="shrink-0 text-lg text-muted" icon="lucide:search"></iconify-icon>
+<input x-model="marketSearch" class="w-full bg-transparent text-sm text-ink placeholder:text-muted focus:outline-none" placeholder="Search handmade goods" type="text"/>
+<button @click="startMarketplaceVoiceSearch()" class="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-accent/10 text-accent transition-colors hover:bg-accent/20" title="Search by voice">
+<iconify-icon class="text-base" icon="lucide:mic"></iconify-icon>
+</button>
+</div>
+</div>
+</div>
+<!-- Voice listening overlay -->
+<div class="mx-auto max-w-7xl px-8 pb-5" x-show="voiceState === 'listening'" x-transition.opacity="">
+<div class="rounded-card border border-line bg-surface p-6 shadow-[0_1px_2px_rgba(22,29,26,0.10),0_4px_4px_rgba(22,29,26,0.09)]">
+<div class="flex items-start gap-5">
+<div class="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-raised text-ink">
+<iconify-icon class="text-xl" icon="lucide:mic"></iconify-icon>
+</div>
+<div class="flex-1">
+<h3 class="font-display text-lg font-semibold text-ink">Listening</h3>
+<p class="mt-1 text-sm text-muted">Say what you are looking for. For example: blue pottery bowls under 800 rupees.</p>
+<div class="mt-4 flex items-center gap-3">
+<button @click="voiceState = 'understanding'; setTimeout(() =&gt; { voiceState = 'idle'; }, 1500)" class="rounded-card bg-accent px-4 py-2 text-sm font-medium text-accentInk shadow-[0_1px_2px_rgba(22,29,26,0.10),0_4px_4px_rgba(22,29,26,0.09)]">Done</button>
+<button @click="voiceState = 'idle'" class="rounded-card border border-line px-4 py-2 text-sm font-medium text-muted transition-colors hover:border-ink/20 hover:text-ink">Cancel</button>
+</div>
+</div>
+<!-- Waveform bars -->
+<div class="flex items-end gap-1 pb-1">
+<span class="h-3 w-1 rounded-full bg-accent/40"></span>
+<span class="h-6 w-1 rounded-full bg-accent/60"></span>
+<span class="h-9 w-1 rounded-full bg-accent"></span>
+<span class="h-5 w-1 rounded-full bg-accent/50"></span>
+<span class="h-7 w-1 rounded-full bg-accent/70"></span>
+<span class="h-4 w-1 rounded-full bg-accent/40"></span>
+</div>
+</div>
+</div>
+</div>
+<!-- Voice understanding shimmer -->
+<div class="mx-auto max-w-7xl px-8 pb-5" x-show="voiceState === 'understanding'" x-transition.opacity="">
+<div class="rounded-card border border-line bg-surface p-6 shadow-[0_1px_2px_rgba(22,29,26,0.05),0_1px_1px_rgba(22,29,26,0.03)]">
+<div class="flex items-center gap-4">
+<div class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-raised text-ink">
+<iconify-icon class="text-base" icon="lucide:sparkles"></iconify-icon>
+</div>
+<div class="flex-1">
+<p class="text-sm font-medium text-ink">Understanding your search…</p>
+<div class="mt-2 flex items-center gap-2">
+<span class="text-xs text-muted">We heard</span>
+<span class="rounded-full bg-raised px-3 py-1 font-mono text-xs text-ink">blue pottery bowls under 800 rupees</span>
+</div>
+</div>
+<svg aria-label="Loading placeholder" class="mx-auto" fill="none" height="53" role="img" viewbox="0 0 120 80" width="80" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<lineargradient id="shimmerSweep" x1="0" x2="1" y1="0" y2="1">
+<stop offset="0" stop-color="currentColor" stop-opacity="0"></stop>
+<stop offset="0.45" stop-color="currentColor" stop-opacity="0.35"></stop>
+<stop offset="0.55" stop-color="currentColor" stop-opacity="0.35"></stop>
+<stop offset="1" stop-color="currentColor" stop-opacity="0"></stop>
+</lineargradient>
+<clippath id="skeletonClip">
+<rect height="64" rx="10" width="104" x="8" y="8"></rect>
+</clippath>
+</defs>
+<g clip-path="url(#skeletonClip)">
+<rect fill="currentColor" fill-opacity="0.15" height="64" rx="10" width="104" x="8" y="8"></rect>
+<rect fill="currentColor" fill-opacity="0.15" height="34" rx="8" width="34" x="18" y="18"></rect>
+<rect fill="currentColor" fill-opacity="0.15" height="7" rx="3.5" width="42" x="60" y="20"></rect>
+<rect fill="currentColor" fill-opacity="0.15" height="7" rx="3.5" width="34" x="60" y="33"></rect>
+<rect fill="currentColor" fill-opacity="0.15" height="7" rx="3.5" width="40" x="60" y="46"></rect>
+<rect fill="currentColor" fill-opacity="0.15" height="6" rx="3" width="84" x="18" y="60"></rect>
+<!-- set --asset-sweep (e.g. -40% to 140%) to drive the diagonal shimmer sweep -->
+<g id="shimmer" style="transform: translateX(var(--asset-sweep, -60px));">
+<rect fill="url(#shimmerSweep)" height="120" transform="skewX(-18)" width="46" x="-60" y="-20"></rect>
+</g>
+</g>
+</svg>
+</div>
+</div>
+</div>
+<!-- Category chips -->
+<div class="mx-auto max-w-7xl px-8 pb-5">
+<div class="flex flex-wrap gap-2">
+<template :key="cat" x-for="cat in ['All','Home','Fashion','Decor','Kitchen','Jewellery','Art']">
+<button :class="marketCategory === cat ? 'bg-accent text-accentInk' : 'bg-surface text-muted hover:border-ink/20 hover:text-ink'" @click="marketCategory = cat" class="rounded-full border border-line px-4 py-2 text-sm font-medium transition-colors" x-text="cat"></button>
+</template>
+</div>
+</div>
+<!-- Filter and sort row -->
+<div class="mx-auto max-w-7xl px-8 pb-5">
+<div class="flex flex-wrap items-center gap-3">
+<button class="flex items-center gap-2 rounded-card border border-line bg-surface px-4 py-2.5 text-sm font-medium text-muted transition-colors hover:border-ink/20 hover:text-ink">
+<iconify-icon class="text-base" icon="lucide:indian-rupee"></iconify-icon>
+        Price
+      </button>
+<button class="flex items-center gap-2 rounded-card border border-line bg-surface px-4 py-2.5 text-sm font-medium text-muted transition-colors hover:border-ink/20 hover:text-ink">
+<iconify-icon class="text-base" icon="lucide:layers"></iconify-icon>
+        Material
+      </button>
+<div class="relative" x-data="{ open: false }">
+<button @click="open = !open" class="flex items-center gap-2 rounded-card border border-line bg-surface px-4 py-2.5 text-sm font-medium text-muted transition-colors hover:border-ink/20 hover:text-ink">
+<iconify-icon class="text-base" icon="lucide:arrow-up-down"></iconify-icon>
+<span x-text="marketSort"></span>
+<iconify-icon class="text-sm" icon="lucide:chevron-down"></iconify-icon>
+</button>
+<div @click.outside="open = false" class="absolute left-0 top-full z-20 mt-2 w-56 rounded-card border border-line bg-surface p-1.5 shadow-[0_4px_12px_rgba(22,29,26,0.10),0_1px_2px_rgba(22,29,26,0.06)]" x-show="open" x-transition="">
+<template :key="opt" x-for="opt in ['Newest first','Price: low to high','Price: high to low','Most reviewed']">
+<button @click="marketSort = opt; open = false" class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm text-muted transition-colors hover:bg-raised hover:text-ink" x-text="opt"></button>
+</template>
+</div>
+</div>
+<div class="ml-auto flex items-center gap-2">
+<template :key="f" x-for="f in filters">
+<span class="inline-flex items-center gap-1.5 rounded-full bg-raised px-3 py-1.5 text-xs font-medium text-ink">
+<span x-text="f"></span>
+<button @click="filters = filters.filter(x =&gt; x !== f)" class="grid h-4 w-4 place-items-center rounded-full text-muted transition-colors hover:bg-ink/10 hover:text-ink">
+<iconify-icon class="text-[10px]" icon="lucide:x"></iconify-icon>
+</button>
+</span>
+</template>
+<button @click="filters = []" class="text-xs font-medium text-muted transition-colors hover:text-ink">Clear all</button>
+</div>
+</div>
+</div>
+<!-- Results header -->
+<div class="mx-auto max-w-7xl px-8 pb-5">
+<div class="flex items-center justify-between">
+<p class="text-sm text-muted" x-text="visibleProducts().length + ' products currently listed'"></p>
+<button @click="showEmpty = !showEmpty" class="text-xs font-medium text-accent transition-colors hover:text-accent/80" x-text="showEmpty ? 'Show products' : 'Show empty state'"></button>
+</div>
+</div>
+<!-- Empty state -->
+<div class="mx-auto max-w-7xl px-8 pb-8" x-show="showEmpty" x-transition.opacity="">
+<div class="rounded-card border border-line bg-surface p-10 text-center shadow-[0_1px_2px_rgba(22,29,26,0.05),0_1px_1px_rgba(22,29,26,0.03)]">
+<img alt="empty-search illustration" class="rounded-card object-cover mx-auto max-w-xs" data-v3-illus="empty-search" height="180" loading="lazy" src="https://image.pollinations.ai/prompt/professional%20editorial%20product%20illustration%2C%20sophisticated%20and%20restrained%2C%20the%20quality%20of%20a%20premium%20app%20onboarding%20screen%2C%20minimal%20still-life%20composition%3A%20a%20magnifying%20glass%20beside%20a%20few%20blank%20paper%20notes%2C%20generous%20negative%20space%2C%20soft%20professional%20editorial%20illustration%2C%20gentle%20pastel%20wash%2C%20rounded%20organic%20forms%2C%20subtle%20paper%20grain%2C%20calm%20studio%20lighting%2C%20strict%20two-tone%20palette%3A%20neutral%20warm%20off-white%20(%23EDF0EF)%20plus%20the%20single%20accent%20color%20%233B82F6%20%E2%80%94%20no%20other%20hues%20anywhere%2C%20flat%20solid%20%23EDF0EF%20background%20filling%20the%20entire%20canvas%20edge%20to%20edge%2C%20absolutely%20no%20cartoon%20style%2C%20no%20childish%20characters%2C%20no%20mascots%2C%20no%20toys%2C%20no%20teddy%20bears%2C%20no%20stuffed%20animals%2C%20no%20faces%20on%20objects%2C%20no%20anthropomorphic%20objects%2C%20no%20smileys%2C%20no%203d%20render%2C%20no%20photograph%2C%20no%20text%2C%20no%20words%2C%20no%20logo%2C%20no%20border%2C%20no%20frame?width=640&amp;height=640&amp;model=flux&amp;nologo=true&amp;seed=52762" width="180"/>
+<h3 class="mt-6 font-display text-xl font-semibold text-ink">No products matched your search</h3>
+<p class="mx-auto mt-2 max-w-sm text-sm text-muted">Try a shorter phrase, remove a filter, or search by voice in your own language.</p>
+<button @click="filters = []; showEmpty = false" class="mt-6 rounded-card bg-ink px-5 py-2.5 text-sm font-medium text-base transition-colors hover:bg-ink/90">Clear all filters</button>
+<div class="mt-8 border-t border-line pt-6">
+<p class="text-xs font-medium uppercase tracking-wider text-muted">Popular right now</p>
+<div class="mt-3 flex flex-wrap justify-center gap-2">
+<template :key="s" x-for="s in ['Terracotta','Handloom cotton','Brass diya','Bamboo basket']">
+<button class="rounded-full border border-line bg-raised px-4 py-2 text-sm font-medium text-ink transition-colors hover:border-ink/20" x-text="s"></button>
+</template>
+</div>
+</div>
+</div>
+</div>
+<!-- Product grid -->
+<div class="mx-auto max-w-7xl px-8 pb-10" x-show="!showEmpty">
+<div class="grid grid-cols-3 gap-5">
+<template :key="p.id" x-for="p in visibleProducts()">
+<div @click="selectProductById(p.id)" class="group cursor-pointer overflow-hidden rounded-card border border-line bg-surface shadow-[0_1px_2px_rgba(22,29,26,0.05),0_1px_1px_rgba(22,29,26,0.03)] transition-colors hover:border-ink/20 hover:shadow-md">
+<div class="aspect-square overflow-hidden bg-raised">
+<div class="v3-photo relative overflow-hidden h-full w-full"><img :alt="p.alt" :src="p.image" class="absolute inset-0 h-full w-full object-cover"/><div class="pointer-events-none absolute inset-0" style="background:linear-gradient(160deg,rgba(244,197,66,0.16) 0%,transparent 100%)"></div><div class="v3-grain pointer-events-none absolute inset-0" style="opacity:0.03"></div></div>
+</div>
+<div class="p-4">
+<h3 class="font-display text-sm font-semibold leading-snug text-ink" x-text="p.short"></h3>
+<p class="mt-1 text-xs text-muted" x-text="p.artisan"></p>
+<div class="mt-3 flex items-center justify-between">
+<span class="font-mono text-sm font-medium tabular-nums text-ink" x-text="formatINR(p.price)"></span>
+<button @click.stop="selectProductById(p.id)" class="rounded-card border border-line px-3 py-1.5 text-xs font-medium text-muted transition-colors hover:border-ink/20 hover:text-ink">View</button>
+</div>
+</div>
+</div>
+</template>
+</div>
+</div>
+</div>
+</div></template>
+<template x-if="page === 'product-detail'"><div>
+<div class="min-h-screen bg-base font-body text-ink">
+<div class="mx-auto max-w-[1180px] px-8 py-8">
+<!-- Page header -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<a @click.prevent="page = 'browse'" class="grid h-9 w-9 place-items-center rounded-xl border border-line bg-surface text-muted hover:border-ink/20 hover:text-ink cursor-pointer" href="#">
+<iconify-icon icon="lucide:arrow-left"></iconify-icon>
+</a>
+<div>
+<h1 class="font-display text-xl font-semibold tracking-tight text-ink">Product detail</h1>
+<p class="text-xs text-muted">Back to results · Home <span x-text="'› ' + products[selectedProduct].category"></span></p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button @click="saveProduct(products[selectedProduct])" class="flex items-center gap-2 rounded-card border border-line bg-surface px-3 py-2 text-sm text-muted hover:border-ink/20 hover:text-ink">
+<iconify-icon icon="lucide:heart"></iconify-icon><span x-text="isSaved(products[selectedProduct]) ? 'Saved' : 'Save'"></span>
+        </button>
+<button @click="shareProduct(products[selectedProduct])" class="flex items-center gap-2 rounded-card border border-line bg-surface px-3 py-2 text-sm text-muted hover:border-ink/20 hover:text-ink">
+<iconify-icon icon="lucide:share-2"></iconify-icon>Share
+        </button>
+</div>
+</div>
+<!-- Main two-column layout -->
+<div class="mt-6 grid grid-cols-12 gap-6" x-data="{ active: 0, expanded: false, placing: false }">
+<!-- LEFT: gallery + description + reviews -->
+<div class="col-span-7 space-y-6">
+<!-- Gallery -->
+<div class="rounded-card border border-line bg-surface p-5 shadow-[0_1px_2px_rgba(22,29,26,0.05),0_1px_1px_rgba(22,29,26,0.03)]">
+<div class="relative overflow-hidden rounded-card bg-raised">
+<div class="v3-photo relative overflow-hidden h-[420px] w-full"><img :alt="products[selectedProduct].alt" :src="products[selectedProduct].image" class="absolute inset-0 h-full w-full object-cover"/><div class="pointer-events-none absolute inset-0" style="background:linear-gradient(160deg,rgba(244,197,66,0.16) 0%,transparent 100%)"></div><div class="v3-grain pointer-events-none absolute inset-0" style="opacity:0.03"></div></div>
+<div class="absolute left-4 top-4 flex items-center gap-2 rounded-full bg-surface/90 px-3 py-1.5 text-xs font-medium text-ink backdrop-blur-sm">
+<span class="h-2 w-2 rounded-full bg-accent2"></span><span x-text="products[selectedProduct].badge || 'Handmade'"></span>
+            </div>
+</div>
+</div>
+<!-- Title + artisan -->
+<div class="rounded-card border border-line bg-surface p-6 shadow-[0_1px_2px_rgba(22,29,26,0.05),0_1px_1px_rgba(22,29,26,0.03)]">
+<div class="flex flex-wrap items-center gap-2">
+<span class="rounded-full bg-accent/10 px-3 py-1 text-xs font-medium text-accent" x-text="products[selectedProduct].category"></span>
+<span class="rounded-full bg-raised px-3 py-1 text-xs font-medium text-muted" x-text="products[selectedProduct].badge || 'Handmade'"></span>
+</div>
+<h2 class="mt-4 font-display text-3xl font-bold tracking-tight text-ink" x-text="products[selectedProduct].title"></h2>
+<div class="mt-3 flex items-center gap-3">
+<p class="text-sm text-muted"><span x-text="products[selectedProduct].stock > 0 ? 'In stock' : 'Out of stock'"></span> · <span x-text="products[selectedProduct].stock + ' available'"></span></p>
+</div>
+<div class="mt-5 flex items-center gap-4 rounded-card bg-raised p-4">
+<div class="grid h-12 w-12 shrink-0 place-items-center rounded-full border border-line bg-surface text-sm font-semibold" x-text="(products[selectedProduct].artisan || 'A').slice(0,1).toUpperCase()"></div>
+<div class="min-w-0 flex-1">
+<p class="text-xs text-muted">Made by</p>
+<p class="font-display text-base font-semibold text-ink" x-text="products[selectedProduct].artisan"></p>
+<p class="truncate text-xs text-muted" x-text="products[selectedProduct].location + ' • Artisan on Kalakart'"></p>
+</div>
+
+</div>
+</div>
+<div class="mt-4 rounded-card border border-line bg-surface p-4">
+  <button @click="messageArtisan(products[selectedProduct])" class="flex w-full items-center justify-center gap-2 rounded-card border border-line bg-raised px-4 py-3 text-sm font-semibold text-ink hover:bg-surface">
+    <iconify-icon icon="lucide:message-circle"></iconify-icon> Message artisan
+  </button>
+  <p class="mt-2 text-center text-xs text-muted">Ask about the craft, materials, customisation or delivery.</p>
+</div>
+<!-- Description -->
+<div class="rounded-card border border-line bg-surface p-6 shadow-[0_1px_2px_rgba(22,29,26,0.05),0_1px_1px_rgba(22,29,26,0.03)]">
+<h3 class="font-display text-base font-semibold text-ink">About this piece</h3>
+<p class="mt-3 text-sm leading-relaxed text-muted">
+<span x-text="products[selectedProduct].about"></span>
+<span x-show="expanded" x-transition.opacity="" x-text="' ' + products[selectedProduct].aboutMore"></span>
+</p>
+<button @click="expanded = !expanded" class="mt-3 inline-flex items-center gap-1 text-sm font-medium text-accent hover:text-ink">
+<span x-text="expanded ? 'Read less' : 'Read more'">Read more</span>
+<iconify-icon :icon="expanded ? 'lucide:chevron-up' : 'lucide:chevron-down'" icon="lucide:circle"></iconify-icon>
+</button>
+</div>
+<!-- Product information -->
+<div class="rounded-card border border-line bg-surface p-6 shadow-[0_1px_2px_rgba(22,29,26,0.05),0_1px_1px_rgba(22,29,26,0.03)]">
+<h3 class="font-display text-base font-semibold text-ink">Product information</h3>
+<div class="mt-4 grid gap-3 sm:grid-cols-2 text-sm">
+<div class="rounded-card bg-raised p-3"><p class="text-xs text-muted">Category</p><p class="mt-1 font-medium" x-text="products[selectedProduct].category"></p></div>
+<div class="rounded-card bg-raised p-3"><p class="text-xs text-muted">Materials</p><p class="mt-1 font-medium" x-text="products[selectedProduct].materials || 'Not specified by artisan'"></p></div>
+</div>
+</div>
+</div>
+<!-- RIGHT: price card, sticky -->
+<div class="col-span-5">
+<div class="sticky top-6 space-y-5">
+<!-- Price breakdown -->
+<div class="rounded-card border border-line bg-surface p-6 shadow-[0_1px_2px_rgba(22,29,26,0.05),0_1px_1px_rgba(22,29,26,0.03)]">
+<div class="flex items-center justify-between">
+<h3 class="font-display text-base font-semibold text-ink">Price details</h3>
+<span class="rounded-full bg-raised px-2 py-0.5 text-xs font-medium text-muted">Marketplace price</span>
+</div>
+<div class="mt-5 space-y-3 text-sm">
+<div class="flex items-center justify-between">
+<span class="text-muted">Product price</span>
+<span class="font-medium tabular-nums text-ink" x-text="formatINR(products[selectedProduct].price)"></span>
+</div>
+<div class="h-px bg-line"></div>
+<div class="flex items-center justify-between">
+<span class="text-muted">Delivery</span>
+<span class="font-medium tabular-nums text-ink">₹95</span>
+</div>
+<div class="h-px bg-line"></div>
+<div class="flex items-center justify-between pt-1">
+<span class="font-medium text-ink">Total</span>
+<span class="font-display text-2xl font-bold tracking-tight tabular-nums text-ink" x-text="formatINR(products[selectedProduct].price + 95)"></span>
+</div>
+</div>
+<div class="mt-5 flex items-start gap-2.5 rounded-card bg-raised p-3.5">
+<span class="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-raised text-ink">
+<iconify-icon class="" icon="lucide:truck"></iconify-icon>
+</span>
+<p class="text-xs leading-relaxed text-muted"><span x-text="'Ships from ' + products[selectedProduct].location + '.'"></span> Standard delivery fee is shown in the price details.</p>
+</div>
+<div class="mt-5 space-y-3">
+<button @click="if (!placing) { placing = true; setTimeout(() =&gt; { placing = false; placeOrder(products[selectedProduct]); }, 1800); }" :disabled="placing" class="flex w-full items-center justify-center gap-2 rounded-card bg-accent px-4 py-3.5 text-sm font-semibold text-accentInk shadow-[0_1px_2px_rgba(22,29,26,0.10),0_4px_4px_rgba(22,29,26,0.09),0_9px_6px_rgba(22,29,26,0.05),0_17px_7px_rgba(22,29,26,0.01),inset_0_2px_8px_rgba(255,255,255,0.6)] hover:bg-accent/90 disabled:opacity-70">
+<iconify-icon :class="placing ? 'animate-spin' : ''" :icon="placing ? 'lucide:loader-circle' : 'lucide:shopping-bag'" icon="lucide:circle"></iconify-icon>
+<span x-text="placing ? 'Placing your order…' : 'Place Order'">Place Order</span>
+</button>
+
+</div>
+<p class="mt-4 flex items-center justify-center gap-1.5 text-xs text-muted">
+<iconify-icon icon="lucide:package"></iconify-icon>
+<span x-text="products[selectedProduct].stock + ' in stock.'"></span>
+            </p>
+</div>
+<!-- Trust / craft note -->
+<div class="rounded-card border border-line bg-surface p-5 shadow-[0_1px_2px_rgba(22,29,26,0.05),0_1px_1px_rgba(22,29,26,0.03)]">
+<div class="flex items-center gap-3">
+<span class="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-raised text-ink">
+<iconify-icon class="" icon="lucide:circle"></iconify-icon>
+</span>
+<p class="text-xs leading-relaxed text-muted"><span class="font-medium text-ink">Direct-from-artisan marketplace</span> — product information and pricing come from the listing stored in Kalakart.</p>
+</div>
+<div class="mt-4 flex items-center gap-3">
+<span class="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-raised text-ink">
+<iconify-icon class="" icon="lucide:shield-check"></iconify-icon>
+</span>
+<p class="text-xs leading-relaxed text-muted">Breakage cover included. Report within 48 hours of delivery.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div></template>
+<template x-if="page === 'order-confirmation'"><div>
+<div class="min-h-screen bg-base font-body">
+<main class="mx-auto max-w-4xl px-8 py-10">
+<!-- Page header -->
+<div class="flex items-center justify-between">
+<div>
+<h1 class="font-display text-xl font-semibold tracking-tight text-ink">Order confirmation</h1>
+<p class="mt-1 text-sm text-muted" x-text="'Order placed on ' + lastOrder.date"></p>
+</div>
+<div class="flex items-center gap-3">
+<button class="rounded-card border border-line bg-surface px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-raised">
+<iconify-icon class="mr-1.5 align-middle text-muted" icon="lucide:download"></iconify-icon>
+          Receipt
+        </button>
+</div>
+</div>
+<!-- Success hero -->
+<div class="mt-8 rounded-card border border-line bg-surface p-8 shadow-[0_1px_2px_rgba(22,29,26,0.05),0_1px_1px_rgba(22,29,26,0.03)]">
+<div class="flex items-start gap-6">
+<div class="grid h-16 w-16 shrink-0 place-items-center rounded-full bg-accent2/20">
+<iconify-icon class="text-3xl text-accent2" icon="lucide:check-circle"></iconify-icon>
+</div>
+<div class="min-w-0">
+<h2 class="font-display text-3xl font-bold tracking-tight text-ink">Order confirmed</h2>
+<p class="mt-2 max-w-lg text-base leading-relaxed text-muted" x-text="lastOrder.artisan + ' has been notified and will pack your order by hand.'"></p>
+</div>
+</div>
+</div>
+<!-- Order summary card -->
+<div class="mt-6 rounded-card border border-line bg-surface p-6 shadow-[0_1px_2px_rgba(22,29,26,0.05),0_1px_1px_rgba(22,29,26,0.03)]">
+<h3 class="font-display text-lg font-semibold tracking-tight text-ink">Order summary</h3>
+<!-- Order ID row -->
+<div class="mt-5 flex items-center justify-between rounded-xl bg-raised px-4 py-3">
+<span class="text-sm text-muted">Order ID</span>
+<span class="font-mono text-sm font-medium text-ink" x-text="lastOrder.id"></span>
+</div>
+<!-- Product row -->
+<div class="mt-5 flex items-start gap-4">
+<div class="v3-photo relative overflow-hidden h-20 w-20 rounded-xl"><img :alt="lastOrder.alt" :src="lastOrder.image" class="absolute inset-0 h-full w-full object-cover"/><div class="pointer-events-none absolute inset-0" style="background:linear-gradient(160deg,rgba(244,197,66,0.16) 0%,transparent 100%)"></div><div class="v3-grain pointer-events-none absolute inset-0" style="opacity:0.03"></div></div>
+<div class="min-w-0 flex-1">
+<p class="text-sm font-medium leading-snug text-ink" x-text="lastOrder.title"></p>
+<div class="mt-2 flex items-center gap-2 text-sm text-muted">
+<iconify-icon icon="lucide:user"></iconify-icon>
+<span x-text="lastOrder.artisan + ', ' + lastOrder.location"></span>
+</div>
+<div class="mt-1 flex items-center gap-2 text-sm text-muted">
+<iconify-icon icon="lucide:package"></iconify-icon>
+<span>Quantity: 1</span>
+</div>
+</div>
+</div>
+<!-- Price breakdown -->
+<div class="mt-6 rounded-xl bg-raised p-4">
+<div class="flex items-center justify-between py-1.5">
+<span class="text-sm text-muted">Product price</span>
+<span class="text-sm font-medium text-ink tabular-nums" x-text="formatINR(lastOrder.price)"></span>
+</div>
+<div class="flex items-center justify-between py-1.5">
+<span class="text-sm text-muted">Delivery</span>
+<span class="text-sm font-medium text-ink tabular-nums" x-text="formatINR(lastOrder.delivery)"></span>
+</div>
+<div class="mt-2 flex items-center justify-between border-t border-line pt-3">
+<span class="font-display text-base font-semibold text-ink">Total paid</span>
+<span class="font-display text-xl font-bold tracking-tight text-ink tabular-nums" x-text="formatINR(lastOrder.total)"></span>
+</div>
+</div>
+<!-- Payment method -->
+<div class="mt-4 flex items-center justify-between rounded-xl bg-raised px-4 py-3">
+<span class="text-sm text-muted">Paid with</span>
+<div class="flex items-center gap-2">
+<iconify-icon class="text-muted" icon="lucide:credit-card"></iconify-icon>
+<span class="text-sm font-medium text-ink">UPI ending 4417</span>
+</div>
+</div>
+</div>
+<!-- Delivery estimate -->
+<div class="mt-6 rounded-card border border-line bg-surface p-6 shadow-[0_1px_2px_rgba(22,29,26,0.05),0_1px_1px_rgba(22,29,26,0.03)]">
+<div class="flex items-start gap-4">
+<div class="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-raised text-ink">
+<iconify-icon class="" icon="lucide:truck"></iconify-icon>
+</div>
+<div>
+<p class="text-sm text-muted">Estimated delivery</p>
+<p class="mt-0.5 font-display text-lg font-semibold tracking-tight text-ink">Within 7-9 days</p>
+<p class="mt-1 text-sm text-muted" x-text="'You will get an SMS when the parcel leaves ' + lastOrder.location + '.'"></p>
+</div>
+</div>
+</div>
+<!-- Actions -->
+<div class="mt-8 flex flex-col gap-3 sm:flex-row">
+<a @click.prevent="page = 'browse'" class="inline-flex flex-1 items-center justify-center gap-2 rounded-card bg-accent px-6 py-3.5 text-sm font-semibold text-accentInk shadow-[0_1px_2px_rgba(22,29,26,0.10),0_4px_4px_rgba(22,29,26,0.09),0_9px_6px_rgba(22,29,26,0.05),0_17px_7px_rgba(22,29,26,0.01),inset_0_2px_8px_rgba(255,255,255,0.6)] transition-colors hover:bg-accent/90 cursor-pointer" href="#">
+        Continue shopping
+        <iconify-icon icon="lucide:arrow-right"></iconify-icon>
+</a>
+<a class="inline-flex flex-1 items-center justify-center gap-2 rounded-card border border-line bg-surface px-6 py-3.5 text-sm font-semibold text-ink transition-colors hover:bg-raised" href="#">
+        View order
+        <iconify-icon class="text-muted" icon="lucide:external-link"></iconify-icon>
+</a>
+</div>
+</main>
+</div>
+</div></template>
+
+<template x-if="page === 'messages'">
+<div class="min-h-screen bg-base font-body text-ink">
+  <div class="mx-auto max-w-6xl px-6 py-8 lg:pl-72 lg:pr-10">
+    <div class="flex items-start justify-between gap-4">
+      <div><p class="text-xs font-medium text-muted">Kalakart / Messages</p><h1 class="mt-1 font-display text-2xl font-semibold">Messages</h1><p class="mt-1 text-sm text-muted" x-text="user?.role === 'artisan' ? 'Talk directly with buyers who contact you.' : 'Talk directly with artisans about their products.'"></p></div>
+      <button @click="user?.role==='artisan' ? (page='dashboard', dashTab='overview') : (page='browse')" class="rounded-card border border-line bg-surface px-4 py-2 text-sm font-medium">Back</button>
+    </div>
+    <div class="mt-6 grid min-h-[560px] overflow-hidden rounded-card border border-line bg-surface shadow-sm md:grid-cols-[260px_1fr]">
+      <aside class="border-b border-line bg-raised md:border-b-0 md:border-r">
+        <div class="border-b border-line p-4"><p class="text-xs font-semibold uppercase tracking-wide text-muted">Conversations</p></div>
+        <div class="max-h-[500px] overflow-y-auto p-2">
+          <template x-for="c in conversationList()" :key="c.id">
+            <button @click="selectConversation(c.id)" :class="selectedMessageUserId===c.id ? 'bg-surface shadow-sm' : 'hover:bg-surface/70'" class="flex w-full items-center gap-3 rounded-card p-3 text-left">
+              <div class="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-line bg-surface text-xs font-semibold" x-text="(c.name||'U').slice(0,1).toUpperCase()"></div>
+              <div class="min-w-0 flex-1"><p class="truncate text-sm font-semibold" x-text="c.name"></p><p class="truncate text-[11px] text-muted" x-text="c.last"></p></div>
+            </button>
+          </template>
+          <div x-show="!conversationList().length" class="p-6 text-center"><iconify-icon class="text-2xl text-muted" icon="lucide:message-circle"></iconify-icon><p class="mt-2 text-sm font-medium">No conversations yet</p><p class="mt-1 text-xs leading-relaxed text-muted" x-text="user?.role==='artisan' ? 'When a buyer messages you, the conversation will appear here.' : 'Open a product and choose Message artisan to start a conversation.'"></p></div>
+        </div>
+      </aside>
+      <section class="flex min-h-[560px] flex-col">
+        <div class="border-b border-line p-4" x-show="selectedMessageUserId"><div class="flex items-center gap-3"><div class="grid h-9 w-9 place-items-center rounded-full border border-line bg-raised text-xs font-semibold" x-text="(selectedMessageName||'U').slice(0,1).toUpperCase()"></div><div><p class="text-sm font-semibold" x-text="selectedMessageName"></p><p class="text-[11px] text-muted">Kalakart conversation</p></div></div></div>
+        <div x-show="!selectedMessageUserId" class="flex flex-1 items-center justify-center p-10 text-center"><div><iconify-icon class="text-4xl text-muted" icon="lucide:message-circle"></iconify-icon><p class="mt-3 text-sm font-medium">Select a conversation</p><p class="mt-1 text-xs text-muted">Your messages are stored in the Kalakart database.</p></div></div>
+        <div x-show="selectedMessageUserId" class="flex-1 space-y-3 overflow-y-auto p-5">
+          <template x-for="m in activeConversation()" :key="m.id"><div :class="m.sender_id===user?.id ? 'justify-end' : 'justify-start'" class="flex"><div :class="m.sender_id===user?.id ? 'bg-accent text-accentInk' : 'bg-raised text-ink'" class="max-w-[78%] rounded-2xl px-4 py-2.5 text-sm"><p x-text="m.text"></p><p class="mt-1 text-[10px] opacity-60" x-text="new Date(m.created_at).toLocaleString()"></p><p x-show="m.product_title" class="mt-1 text-[10px] opacity-70" x-text="'Product: ' + m.product_title"></p></div></div></template>
+        </div>
+        <div x-show="selectedMessageUserId" class="border-t border-line p-4"><div class="flex gap-2"><input @keydown.enter="sendMessage()" x-model="messageText" maxlength="2000" class="min-w-0 flex-1 rounded-card border border-line bg-raised px-4 py-3 text-sm outline-none focus:border-accent" placeholder="Type a message…"/><button @click="sendMessage()" :disabled="messageSending || !messageText.trim()" class="rounded-card bg-accent px-4 py-3 text-sm font-semibold text-accentInk disabled:opacity-50"><iconify-icon icon="lucide:send"></iconify-icon></button></div><p x-show="messageError" class="mt-2 text-xs text-red-600" x-text="messageError"></p></div>
+      </section>
+    </div>
+  </div>
+</div>
+</template>
+<template x-if="page === 'dashboard'">
+  <div>
+    
+<aside class="fixed left-0 top-0 z-30 flex h-screen w-60 flex-col border-r border-line bg-surface">
+<div class="flex items-center gap-2.5 border-b border-line px-5 py-5">
+<div class="grid h-8 w-8 shrink-0 place-items-center rounded-card bg-accent">
+<span class="text-xs font-bold text-accentInk">KA</span>
+</div>
+<span class="font-display text-lg font-semibold tracking-tight text-ink truncate">Kalakart</span>
+</div>
+<nav class="flex-1 space-y-1 overflow-y-auto px-3 py-4">
+<a href="#" @click.prevent="dashTab = 'browse'" :class="dashTab === 'browse' ? 'bg-accent/10 text-accent' : 'text-muted hover:bg-raised hover:text-ink'" class="flex items-center gap-3 rounded-card px-3 py-2.5 text-sm font-medium transition cursor-pointer">
+<iconify-icon class="text-lg" icon="lucide:search"></iconify-icon>
+        Browse
+      </a>
+<a href="#" @click.prevent="dashTab = 'add-product'" :class="dashTab === 'add-product' ? 'bg-accent/10 text-accent' : 'text-muted hover:bg-raised hover:text-ink'" class="flex items-center gap-3 rounded-card px-3 py-2.5 text-sm font-medium transition cursor-pointer">
+<iconify-icon class="text-lg" icon="lucide:plus-circle"></iconify-icon>
+        Add Product
+      </a>
+<a href="#" @click.prevent="dashTab = 'products'" :class="dashTab === 'products' ? 'bg-accent/10 text-accent' : 'text-muted hover:bg-raised hover:text-ink'" class="flex items-center gap-3 rounded-card px-3 py-2.5 text-sm font-medium transition cursor-pointer">
+<iconify-icon class="text-lg" icon="lucide:package"></iconify-icon>
+        My Products
+      </a>
+<a href="#" @click.prevent="dashTab = 'orders'" :class="dashTab === 'orders' ? 'bg-accent/10 text-accent' : 'text-muted hover:bg-raised hover:text-ink'" class="flex items-center gap-3 rounded-card px-3 py-2.5 text-sm font-medium transition cursor-pointer">
+<iconify-icon class="text-lg" icon="lucide:receipt"></iconify-icon>
+        Orders
+      </a>
+<a href="#" @click.prevent="openMessages()" :class="page === 'messages' ? 'bg-accent/10 text-accent' : 'text-muted hover:bg-raised hover:text-ink'" class="flex items-center gap-3 rounded-card px-3 py-2.5 text-sm font-medium transition cursor-pointer">
+<iconify-icon class="text-lg" icon="lucide:message-circle"></iconify-icon>
+        Messages
+        <span x-show="unreadMessages" x-text="unreadMessages" class="ml-auto rounded-full bg-accent px-2 py-0.5 text-[10px] font-bold text-accentInk"></span>
+      </a>
+<a href="#" @click.prevent="dashTab = 'profile'" :class="dashTab === 'profile' ? 'bg-accent/10 text-accent' : 'text-muted hover:bg-raised hover:text-ink'" class="flex items-center gap-3 rounded-card px-3 py-2.5 text-sm font-medium transition cursor-pointer">
+<iconify-icon class="text-lg" icon="lucide:user"></iconify-icon>
+        Profile
+      </a>
+</nav>
+<div class="border-t border-line px-4 py-4">
+<div class="flex items-center gap-3">
+<div class="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-line bg-raised text-xs font-semibold" x-text="(user?.name || 'A').slice(0,1).toUpperCase()"></div>
+<p class="min-w-0 flex-1 truncate text-sm font-medium text-ink" x-text="user?.name || 'Artisan'"></p>
+</div>
+</div>
+</aside>
+    <main class="ml-60">
+      <template x-if="dashTab === 'overview'">
+  <div>
+    <div class="min-h-screen bg-base font-body text-ink">
+      <div class="mx-auto max-w-7xl px-8 py-8">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h1 class="font-display text-xl font-semibold tracking-tight text-ink">Overview</h1>
+            <p class="mt-1 text-sm text-muted">Welcome back, <span x-text="user?.name || 'Artisan'"></span>. Your dashboard uses only your saved Kalakart data.</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <button @click="dashTab='add-product'" class="flex items-center gap-2 rounded-card bg-accent px-4 py-2 text-sm font-medium text-accentInk hover:bg-accent/90">
+              <iconify-icon icon="lucide:plus"></iconify-icon> Add product
+            </button>
+            <button @click="logout()" class="flex items-center gap-2 rounded-card border border-line bg-surface px-4 py-2 text-sm font-medium text-ink hover:bg-raised">
+              <iconify-icon icon="lucide:log-out"></iconify-icon> Logout
+            </button>
+          </div>
+        </div>
+
+        <div class="mt-8 grid grid-cols-2 gap-5 lg:grid-cols-4">
+          <div class="rounded-card bg-surface p-6 shadow-sm">
+            <div class="grid h-9 w-9 place-items-center rounded-xl bg-raised"><iconify-icon icon="lucide:package"></iconify-icon></div>
+            <p class="mt-4 text-sm text-muted">My products</p>
+            <p class="mt-1 font-display text-3xl font-bold tracking-tight tabular-nums" x-text="analytics.personal.products"></p>
+          </div>
+          <div class="rounded-card bg-surface p-6 shadow-sm">
+            <div class="grid h-9 w-9 place-items-center rounded-xl bg-raised"><iconify-icon icon="lucide:shopping-bag"></iconify-icon></div>
+            <p class="mt-4 text-sm text-muted">Orders</p>
+            <p class="mt-1 font-display text-3xl font-bold tracking-tight tabular-nums" x-text="analytics.personal.orders"></p>
+          </div>
+          <div class="rounded-card bg-surface p-6 shadow-sm">
+            <div class="grid h-9 w-9 place-items-center rounded-xl bg-raised"><iconify-icon icon="lucide:users"></iconify-icon></div>
+            <p class="mt-4 text-sm text-muted">Unique buyers</p>
+            <p class="mt-1 font-display text-3xl font-bold tracking-tight tabular-nums" x-text="analytics.personal.buyers"></p>
+          </div>
+          <div class="rounded-card bg-surface p-6 shadow-sm">
+            <div class="grid h-9 w-9 place-items-center rounded-xl bg-raised"><iconify-icon icon="lucide:indian-rupee"></iconify-icon></div>
+            <p class="mt-4 text-sm text-muted">Revenue</p>
+            <p class="mt-1 font-display text-3xl font-bold tracking-tight tabular-nums" x-text="formatINR(analytics.personal.revenue)"></p>
+          </div>
+        </div>
+
+        <div class="mt-5 grid gap-5 lg:grid-cols-3">
+          <div class="lg:col-span-2 rounded-card bg-surface p-6 shadow-sm">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-wider text-muted" x-text="analytics.marketplace.hasData ? 'YOUR MARKET INSIGHTS' : 'GENERAL MARKET INSIGHTS'"></p>
+                <h2 class="mt-2 font-display text-2xl font-semibold tracking-tight" x-text="analytics.marketplace.hasData ? 'Trends from accumulated marketplace data' : 'Useful guidance while your store is getting started'"></h2>
+                <p class="mt-2 text-sm text-muted" x-show="!analytics.marketplace.hasData">These are general marketplace categories and listing guidance. They are not your personal sales statistics.</p>
+                <p class="mt-2 text-sm text-muted" x-show="analytics.marketplace.hasData">These insights are calculated from the marketplace products and orders stored in the database.</p>
+              </div>
+              <span class="shrink-0 rounded-full bg-raised px-3 py-1 text-[10px] font-semibold text-muted" x-text="analytics.marketplace.hasData ? 'REAL DATA' : 'DEFAULT GUIDANCE'"></span>
+            </div>
+
+            <div class="mt-6 grid gap-4 sm:grid-cols-2">
+              <div class="rounded-card border border-line bg-raised p-4">
+                <p class="text-xs font-medium text-muted">Popular categories</p>
+                <div class="mt-3 space-y-2" x-show="!analytics.marketplace.hasData">
+                  <p class="text-sm font-medium">Home Decor</p><p class="text-sm font-medium">Textiles</p><p class="text-sm font-medium">Pottery & Terracotta</p><p class="text-sm font-medium">Jewellery</p>
+                </div>
+                <div class="mt-3 space-y-2" x-show="analytics.marketplace.hasData">
+                  <template x-for="item in analytics.marketplace.topCategories" :key="item.category">
+                    <div class="flex items-center justify-between text-sm"><span x-text="item.category"></span><span class="font-mono" x-text="item.orders + ' orders'"></span></div>
+                  </template>
+                  <p class="text-xs text-muted" x-show="!analytics.marketplace.topCategories.length">Not enough marketplace orders yet.</p>
+                </div>
+              </div>
+              <div class="rounded-card border border-line bg-raised p-4">
+                <p class="text-xs font-medium text-muted">Listing guidance</p>
+                <ul class="mt-3 space-y-2 text-sm text-ink">
+                  <li>• Use clear product photos in natural light.</li>
+                  <li>• Mention materials, dimensions and making process.</li>
+                  <li>• Add specific tags buyers can search for.</li>
+                  <li x-show="analytics.personal.products === 0">• Add your first product to start building personal insights.</li>
+                  <li x-show="analytics.personal.orders === 0 && analytics.personal.products > 0">• Your personal sales insights will appear after buyers place orders.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="rounded-card bg-surface p-6 shadow-sm">
+            <div class="flex items-center gap-2">
+              <div class="grid h-9 w-9 place-items-center rounded-xl bg-raised"><iconify-icon icon="lucide:sparkles"></iconify-icon></div>
+              <div><p class="text-sm font-semibold">Kalakart AI assistant</p><p class="text-xs text-muted">Ask about your products, orders or marketplace.</p></div>
+            </div>
+            <div class="mt-4 max-h-72 space-y-3 overflow-y-auto">
+              <template x-for="(m, i) in assistantMessages" :key="i">
+                <div :class="m.role==='user' ? 'ml-8 bg-accent text-white' : 'mr-4 bg-raised text-ink'" class="rounded-card px-3 py-2 text-xs leading-relaxed">
+                  <span x-text="m.text"></span>
+                </div>
+              </template>
+              <div x-show="assistantBusy" class="mr-4 rounded-card bg-raised px-3 py-2 text-xs text-muted">Thinking…</div>
+            </div>
+            <div class="mt-4 flex gap-2">
+              <input @keydown.enter="askAssistant()" x-model="assistantInput" class="min-w-0 flex-1 rounded-card border border-line bg-raised px-3 py-2 text-xs outline-none focus:border-accent" placeholder="e.g. Which product has most orders?"/>
+              <button @click="askAssistant()" class="grid h-9 w-9 shrink-0 place-items-center rounded-card bg-accent text-white"><iconify-icon icon="lucide:send"></iconify-icon></button>
+            </div>
+            <p class="mt-2 text-[10px] text-muted">AI answers are grounded in the data returned by your Kalakart database.</p>
+          </div>
+        </div>
+
+        <div class="mt-5 grid gap-5 lg:grid-cols-3">
+          <div class="lg:col-span-2 rounded-card bg-surface p-6 shadow-sm">
+            <div class="flex items-center justify-between">
+              <div><p class="text-sm font-medium">My products</p><p class="mt-1 text-xs text-muted">Only products owned by this account.</p></div>
+              <button @click="dashTab='products'" class="text-sm text-accent">View all</button>
+            </div>
+            <div class="mt-5 grid gap-3 sm:grid-cols-2" x-show="myProducts.length">
+              <template x-for="p in myProducts.slice(0,4)" :key="p.id">
+                <div class="flex items-center gap-3 rounded-card border border-line bg-raised p-3">
+                  <img :src="p.image_url || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2264%22 height=%2264%22%3E%3Crect width=%22100%25%22 height=%22100%25%22 fill=%22%23EDF0EF%22/%3E%3C/svg%3E'" class="h-14 w-14 rounded-xl object-cover"/>
+                  <div class="min-w-0"><p class="truncate text-sm font-semibold" x-text="p.title"></p><p class="text-xs text-muted" x-text="p.category + ' · ' + formatINR(p.price)"></p></div>
+                </div>
+              </template>
+            </div>
+            <div x-show="!myProducts.length" class="rounded-card border border-dashed border-line bg-raised p-8 text-center">
+              <p class="text-sm font-medium">No products yet</p><p class="mt-1 text-xs text-muted">Your personal product count is correctly 0. Add a product to start.</p>
+              <button @click="dashTab='add-product'" class="mt-4 rounded-card bg-accent px-4 py-2 text-xs font-semibold text-white">Add your first product</button>
+            </div>
+          </div>
+          <div class="rounded-card bg-surface p-6 shadow-sm">
+            <p class="text-sm font-medium">Recent orders</p>
+            <div class="mt-4 space-y-3" x-show="myOrders.length">
+              <template x-for="o in myOrders.slice(0,5)" :key="o.id">
+                <div class="flex items-center justify-between gap-3 rounded-card bg-raised px-3 py-2.5">
+                  <div class="min-w-0"><p class="truncate text-xs font-semibold" x-text="o.product_title"></p><p class="text-[11px] text-muted" x-text="o.status + ' · ' + new Date(o.created_at).toLocaleDateString()"></p></div>
+                  <span class="font-mono text-xs" x-text="formatINR(o.total)"></span>
+                </div>
+              </template>
+            </div>
+            <p x-show="!myOrders.length" class="mt-4 rounded-card bg-raised p-5 text-center text-xs text-muted">No orders yet. Order count and revenue stay at 0 until real orders are recorded.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+<template x-if="dashTab === 'browse'">
+<div class="min-h-screen bg-base font-body text-ink">
+  <div class="mx-auto max-w-7xl px-8 py-8">
+    <div class="flex flex-wrap items-start justify-between gap-4">
+      <div><div class="flex items-center gap-2 text-xs font-medium text-muted"><span>Marketplace</span><iconify-icon icon="lucide:chevron-right"></iconify-icon><span class="text-ink">Browse</span></div><h1 class="mt-1 font-display text-xl font-semibold">Browse crafts</h1><p class="mt-1 text-sm text-muted">Products currently stored in the Kalakart marketplace database.</p></div>
+      <button @click="loadMarketplace()" class="rounded-card border border-line bg-surface px-4 py-2 text-sm font-medium hover:bg-raised"><iconify-icon icon="lucide:refresh-cw"></iconify-icon> Refresh</button>
+    </div>
+    <div class="mt-6 rounded-card border border-line bg-surface p-5">
+      <div class="flex items-center gap-2"><span class="rounded-full bg-raised px-3 py-1 text-[10px] font-semibold text-muted">DATABASE MARKETPLACE DATA</span><span class="text-xs text-muted" x-text="visibleProducts().length + ' products currently listed'"></span></div>
+    </div>
+    <div class="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3" x-show="products.length">
+      <template x-for="p in products" :key="p.id">
+        <div class="overflow-hidden rounded-card border border-line bg-surface shadow-sm">
+          <div class="aspect-square bg-raised"><img :src="p.image_url || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22600%22 height=%22600%22%3E%3Crect width=%22100%25%22 height=%22100%25%22 fill=%22%23EDF0EF%22/%3E%3C/svg%3E'" class="h-full w-full object-cover"></div>
+          <div class="p-4"><h3 class="font-display text-sm font-semibold" x-text="p.title"></h3><p class="mt-1 text-xs text-muted" x-text="p.category"></p><div class="mt-3 flex items-center justify-between"><span class="font-mono text-sm" x-text="formatINR(p.price)"></span><span class="text-xs text-muted" x-text="p.stock + ' in stock'"></span></div></div>
+        </div>
+      </template>
+    </div>
+    <div x-show="!products.length" class="mt-5 rounded-card border border-dashed border-line bg-surface p-10 text-center"><p class="text-sm font-medium">No marketplace products yet</p><p class="mt-1 text-xs text-muted">This is a real empty marketplace state.</p></div>
+  </div>
+</div>
+</template><template x-if="dashTab === 'add-product'">
+        <div>
+<div class="min-h-screen bg-base font-body text-ink" x-data="addProduct()">
+<!-- Sticky header -->
+<div class="mx-auto flex h-16 max-w-5xl items-center justify-between px-6">
+<div class="flex items-center gap-3">
+<button @click="dashTab = 'overview'" aria-label="Back" class="grid h-9 w-9 place-items-center rounded-card border border-line bg-surface text-muted transition-colors hover:border-ink/20 hover:text-ink">
+<iconify-icon class="text-lg" icon="lucide:arrow-left"></iconify-icon>
+</button>
+<h1 class="font-display text-xl font-semibold tracking-tight text-ink">Add your product</h1>
+</div>
+<div class="flex items-center gap-2 text-xs text-muted">
+<template x-if="draftState === 'saving'">
+<span class="flex items-center gap-1.5">
+<iconify-icon class="animate-spin text-sm" icon="lucide:loader-2"></iconify-icon>
+            Saving draft…
+          </span>
+</template>
+<template x-if="draftState === 'saved'">
+<span class="flex items-center gap-1.5">
+<iconify-icon class="text-sm text-green-600" icon="lucide:check"></iconify-icon>
+            Draft saved locally on this device
+          </span>
+</template>
+</div>
+</div>
+<main class="mx-auto max-w-5xl px-6 pb-32 pt-6">
+<div class="grid grid-cols-1 gap-5 lg:grid-cols-5">
+<!-- LEFT COLUMN -->
+<div class="space-y-5 lg:col-span-3">
+<!-- Image upload -->
+<section class="rounded-card border border-line bg-surface p-6 shadow-[0_1px_2px_rgba(22,29,26,0.05),0_1px_1px_rgba(22,29,26,0.03)]">
+<div class="mb-4 flex items-center justify-between">
+<h2 class="text-sm font-semibold text-ink">Add photos</h2>
+<span class="text-xs text-muted">1 to 6 photos</span>
+</div>
+<input @change="handleFiles($event.target.files); $event.target.value = ''" accept="image/*" class="hidden" multiple="" type="file" x-ref="galleryInput"/>
+<input @change="handleFiles($event.target.files); $event.target.value = ''" accept="image/*" capture="environment" class="hidden" type="file" x-ref="cameraInput"/>
+<div @dragover.prevent="" @drop.prevent="handleFiles($event.dataTransfer.files)" class="rounded-card border-2 border-dashed border-line bg-raised/50 p-6 text-center transition-colors hover:border-ink/20">
+<div class="mx-auto grid h-12 w-12 place-items-center rounded-xl bg-raised text-ink">
+<iconify-icon class="text-2xl" icon="lucide:image-plus"></iconify-icon>
+</div>
+<p class="mt-3 text-sm font-medium text-ink">Drop photos here</p>
+<p class="mt-1 text-xs text-muted">JPG or PNG, up to 8 MB each</p>
+<div class="mt-4 flex justify-center gap-3">
+<button :disabled="photos.length &gt;= 6" @click="$refs.cameraInput.click()" class="flex items-center gap-2 rounded-card border border-line bg-surface px-4 py-2 text-sm font-medium text-ink transition-colors hover:bg-raised disabled:cursor-not-allowed disabled:opacity-50" type="button">
+<iconify-icon class="text-base text-muted" icon="lucide:camera"></iconify-icon>
+                Take photo
+              </button>
+<button :disabled="photos.length &gt;= 6" @click="$refs.galleryInput.click()" class="flex items-center gap-2 rounded-card border border-line bg-surface px-4 py-2 text-sm font-medium text-ink transition-colors hover:bg-raised disabled:cursor-not-allowed disabled:opacity-50" type="button">
+<iconify-icon class="text-base text-muted" icon="lucide:image"></iconify-icon>
+                Choose from gallery
+              </button>
+</div>
+</div>
+<!-- Thumbnails -->
+<div class="mt-4 grid grid-cols-4 gap-3">
+<template :key="i" x-for="(photo, i) in photos">
+<div class="group relative aspect-square overflow-hidden rounded-card border border-line bg-raised">
+<div class="v3-photo relative overflow-hidden h-full w-full"><img :src="photo.src" alt="" class="absolute inset-0 h-full w-full object-cover" src="https://picsum.photos/seed/req-1790137036631-h5rqapn1o-1-1/1200/900"/><div class="pointer-events-none absolute inset-0" style="background:linear-gradient(160deg,rgba(244,197,66,0.16) 0%,transparent 100%)"></div><div class="v3-grain pointer-events-none absolute inset-0" style="opacity:0.03"></div></div>
+<span class="absolute left-1.5 top-1.5 rounded-full bg-ink/80 px-2 py-0.5 text-[10px] font-medium text-base" x-show="i === 0">Cover photo</span>
+<button @click="removePhoto(i)" aria-label="Remove photo" class="absolute right-1.5 top-1.5 grid h-6 w-6 place-items-center rounded-full bg-ink/70 text-base opacity-0 transition-opacity group-hover:opacity-100">
+<iconify-icon class="text-xs" icon="lucide:x"></iconify-icon>
+</button>
+</div>
+</template>
+<button @click="$refs.galleryInput.click()" class="aspect-square rounded-card border-2 border-dashed border-line bg-raised/50 text-muted transition-colors hover:border-ink/20 hover:text-ink" type="button" x-show="photos.length &lt; 6">
+<iconify-icon class="text-xl" icon="lucide:plus"></iconify-icon>
+</button>
+</div>
+<!-- Upload error -->
+<div class="mt-3 flex items-start gap-2 rounded-card bg-red-50 px-3.5 py-2.5 text-xs text-red-700" x-show="uploadError">
+<iconify-icon class="mt-0.5 text-sm shrink-0" icon="lucide:alert-circle"></iconify-icon>
+<span x-text="uploadErrorMsg"></span>
+</div>
+<div class="mt-4 flex flex-wrap items-center gap-2">
+<button @click="identifyImage()" :disabled="aiBusy" class="inline-flex items-center gap-2 rounded-card border border-line bg-raised px-4 py-2.5 text-xs font-semibold text-ink hover:border-ink/20 disabled:opacity-60"><iconify-icon icon="lucide:scan-eye"></iconify-icon><span x-text="aiBusy ? 'Analyzing photo…' : 'Identify with image AI'"></span></button>
+<span class="text-[11px] text-muted">AI suggestions are reviewable before publishing.</span>
+</div>
+<div x-show="aiVision" class="mt-3 rounded-card bg-raised px-3.5 py-2.5 text-xs leading-relaxed text-ink"><span class="font-semibold">AI note:</span> <span x-text="aiVision"></span></div>
+</section>
+<!-- Voice input panel -->
+<section class="rounded-card border border-line bg-surface p-6 shadow-[0_1px_2px_rgba(22,29,26,0.05),0_1px_1px_rgba(22,29,26,0.03)]">
+<h2 class="text-sm font-semibold text-ink">Describe your product</h2>
+<p class="mt-1 text-xs leading-relaxed text-muted">Tap the mic and speak in your language. Say what it is, what it is made of, and how long it took to make.</p>
+<div class="mt-4 flex flex-wrap items-center gap-2">
+<label class="text-xs font-medium text-muted">Voice language</label>
+<select x-model="voiceLanguage" class="rounded-card border border-line bg-raised px-3 py-2 text-xs outline-none focus:border-accent">
+<option value="en-IN">English (India)</option><option value="hi-IN">Hindi</option><option value="ta-IN">Tamil</option><option value="te-IN">Telugu</option><option value="kn-IN">Kannada</option><option value="ml-IN">Malayalam</option><option value="bn-IN">Bengali</option><option value="mr-IN">Marathi</option><option value="gu-IN">Gujarati</option><option value="pa-IN">Punjabi</option>
+</select>
+<span class="rounded-full bg-raised px-2.5 py-1 text-[10px] text-muted">Browser speech recognition</span>
+</div>
+<div class="mt-5 flex flex-col items-center">
+<!-- Mic button -->
+<button :class="voiceState === 'listening' ? 'bg-accent text-accentInk' : 'bg-ink text-base'" @click="toggleMic()" class="relative grid h-24 w-24 place-items-center rounded-full transition-colors">
+<iconify-icon :icon="voiceState === 'listening' ? 'lucide:square' : 'lucide:mic'" class="text-3xl" icon="lucide:circle"></iconify-icon>
+<span class="absolute inset-0 animate-ping rounded-full bg-accent/30" x-show="voiceState === 'listening'"></span>
+</button>
+<!-- State label -->
+<div class="mt-4 flex flex-col items-center gap-1">
+<template x-if="voiceState === 'ready'">
+<div class="flex flex-col items-center">
+<span class="text-sm font-medium text-ink">Ready</span>
+<span class="text-xs text-muted">Tap to stop</span>
+</div>
+</template>
+<template x-if="voiceState === 'listening'">
+<div class="flex flex-col items-center">
+<span class="text-sm font-medium text-accent">Listening</span>
+<!-- Waveform -->
+<div class="mt-2 flex items-end gap-1 h-6">
+<template :key="n" x-for="n in 7">
+<span :style="`height: ${[8,16,24,12,20,10,18][n-1]}px`" class="w-1 rounded-full bg-accent"></span>
+</template>
+</div>
+<span class="mt-1 text-xs text-muted">Tap to stop</span>
+</div>
+</template>
+<template x-if="voiceState === 'processing'">
+<div class="flex flex-col items-center">
+<span class="flex items-center gap-1.5 text-sm font-medium text-ink">
+<iconify-icon class="animate-spin text-base" icon="lucide:loader-2"></iconify-icon>
+                    Processing
+                  </span>
+</div>
+</template>
+<template x-if="voiceState === 'done'">
+<button @click="resetVoice()" class="flex items-center gap-1.5 rounded-card border border-line px-3 py-1.5 text-xs font-medium text-muted transition-colors hover:border-ink/20 hover:text-ink">
+<iconify-icon class="text-sm" icon="lucide:rotate-ccw"></iconify-icon>
+                  Record again
+                </button>
+</template>
+</div>
+</div>
+<!-- Voice error -->
+<div class="mt-4 flex items-start gap-2 rounded-card bg-red-50 px-3.5 py-2.5 text-xs text-red-700" x-show="voiceError">
+<iconify-icon class="mt-0.5 text-sm shrink-0" icon="lucide:alert-circle"></iconify-icon>
+<span>We could not hear that clearly. Move closer to the mic and try again.</span>
+</div>
+<!-- Transcript -->
+<div class="mt-5">
+<div class="mb-2 flex items-center justify-between">
+<label class="text-xs font-medium text-muted">What we heard</label>
+<button @click="editingTranscript = !editingTranscript" class="flex items-center gap-1 text-xs font-medium text-accent transition-colors hover:text-accent/80">
+<iconify-icon class="text-sm" icon="lucide:pencil"></iconify-icon>
+                Edit transcript
+              </button>
+</div>
+<textarea :readonly="!editingTranscript" class="w-full resize-none rounded-card border border-line bg-raised px-4 py-3 text-sm leading-relaxed text-ink placeholder:text-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent" placeholder="Your words will appear here as you speak." rows="3" x-model="transcript"></textarea>
+</div>
+<!-- Generate listing button -->
+<button :disabled="generating" @click="generateListing()" class="mt-4 flex w-full items-center justify-center gap-2 rounded-card bg-accent px-5 py-3 text-sm font-semibold text-accentInk shadow-[0_1px_2px_rgba(22,29,26,0.10),0_4px_4px_rgba(22,29,26,0.09),0_9px_6px_rgba(22,29,26,0.05),0_17px_7px_rgba(22,29,26,0.01),inset_0_2px_8px_rgba(255,255,255,0.6)] transition-colors hover:bg-accent/90 disabled:opacity-60">
+<template x-if="!generating">
+<span class="flex items-center gap-2">
+<iconify-icon class="text-base" icon="lucide:sparkles"></iconify-icon>
+                Generate listing
+              </span>
+</template>
+<template x-if="generating">
+<span class="flex items-center gap-2">
+<iconify-icon class="animate-spin text-base" icon="lucide:loader-2"></iconify-icon>
+                Writing your listing…
+              </span>
+</template>
+</button>
+</section>
+</div>
+<!-- RIGHT COLUMN -->
+<div class="space-y-5 lg:col-span-2">
+<!-- AI listing preview -->
+<section class="relative rounded-card border border-line bg-surface p-6 shadow-[0_1px_2px_rgba(22,29,26,0.05),0_1px_1px_rgba(22,29,26,0.03)]">
+<div class="mb-4 flex items-center gap-2">
+<div class="grid h-9 w-9 place-items-center rounded-xl bg-raised text-ink">
+<iconify-icon class="text-base" icon="lucide:sparkles"></iconify-icon>
+</div>
+<div>
+<h2 class="text-sm font-semibold text-ink">Your listing</h2>
+<p class="text-xs text-muted">Check the words below. Tap any field to edit before you publish.</p>
+</div>
+</div>
+<!-- Shimmer overlay -->
+<div class="absolute inset-0 z-10 flex items-center justify-center rounded-card bg-surface/80 backdrop-blur-sm" x-show="generating">
+<div class="w-full px-6">
+<div class="h-4 w-3/4 animate-pulse rounded bg-raised"></div>
+<div class="mt-3 h-3 w-full animate-pulse rounded bg-raised"></div>
+<div class="mt-2 h-3 w-5/6 animate-pulse rounded bg-raised"></div>
+<div class="mt-2 h-3 w-2/3 animate-pulse rounded bg-raised"></div>
+<div class="mt-4 flex gap-2">
+<div class="h-6 w-16 animate-pulse rounded-full bg-raised"></div>
+<div class="h-6 w-20 animate-pulse rounded-full bg-raised"></div>
+<div class="h-6 w-14 animate-pulse rounded-full bg-raised"></div>
+</div>
+</div>
+</div>
+<div class="space-y-4">
+<div>
+<label class="mb-1.5 block text-xs font-medium text-muted">Product title</label>
+<input class="w-full rounded-card border border-line bg-raised px-3.5 py-2.5 text-sm font-medium text-ink focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent" type="text" x-model="title"/>
+</div>
+<div>
+<label class="mb-1.5 block text-xs font-medium text-muted">Description</label>
+<textarea class="w-full resize-none rounded-card border border-line bg-raised px-3.5 py-2.5 text-sm leading-relaxed text-ink focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent" rows="5" x-model="description"></textarea>
+</div>
+<div>
+<label class="mb-1.5 block text-xs font-medium text-muted">Category</label>
+<select class="w-full rounded-card border border-line bg-raised px-3.5 py-2.5 text-sm text-ink focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent" x-model="category">
+<option>Home</option>
+<option>Kitchen</option>
+<option>Decor</option>
+<option>Textiles</option>
+<option>Fashion</option>
+<option>Art</option>
+</select>
+</div>
+<div>
+<label class="mb-1.5 block text-xs font-medium text-muted">Tags</label>
+<div class="flex flex-wrap gap-2">
+<template :key="tag" x-for="(tag, i) in tags">
+<span class="group flex items-center gap-1.5 rounded-full bg-raised px-3 py-1 text-xs font-medium text-ink">
+<span x-text="tag"></span>
+<button @click="removeTag(i)" aria-label="Remove tag" class="text-muted transition-colors hover:text-ink">
+<iconify-icon class="text-xs" icon="lucide:x"></iconify-icon>
+</button>
+</span>
+</template>
+<div class="flex items-center gap-1 rounded-full border border-dashed border-line px-3 py-1 focus-within:border-accent">
+<iconify-icon class="text-xs text-muted" icon="lucide:plus"></iconify-icon>
+<input @keydown.enter.prevent="addTag()" @blur="addTag()" class="w-24 bg-transparent text-xs font-medium text-ink placeholder:text-muted focus:outline-none" placeholder="Add a tag" type="text" x-model="newTag"/>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- AI price suggestion -->
+<section class="rounded-card border border-line bg-surface p-6 shadow-[0_1px_2px_rgba(22,29,26,0.05),0_1px_1px_rgba(22,29,26,0.03)]">
+<div class="mb-4 flex items-center gap-2">
+<div class="grid h-9 w-9 place-items-center rounded-xl bg-raised text-ink">
+<iconify-icon class="text-base" icon="lucide:tag"></iconify-icon>
+</div>
+<h2 class="text-sm font-semibold text-ink">Suggested price</h2>
+</div>
+<!-- Gauge asset -->
+<svg class="mx-auto my-2" fill="none" height="132" viewbox="0 0 100 60" width="220" xmlns="http://www.w3.org/2000/svg">
+<!-- Out-of-range blush band (full semicircle) -->
+<path d="M 10 50 A 40 40 0 0 1 90 50" stroke="currentColor" stroke-linecap="round" stroke-opacity="0.15" stroke-width="8"></path>
+<!-- Fair range mint band: from 30% to 70% of the semicircle -->
+<path d="M 22.4 26.4 A 40 40 0 0 1 77.6 26.4" stroke="currentColor" stroke-linecap="round" stroke-opacity="0.35" stroke-width="8"></path>
+<!-- Tick marks -->
+<g stroke="currentColor" stroke-linecap="round" stroke-opacity="0.4" stroke-width="1.2">
+<line x1="10" x2="14" y1="50" y2="50"></line>
+<line x1="20" x2="23.4" y1="30.4" y2="32.4"></line>
+<line x1="35.9" x2="37.9" y1="17.5" y2="20.9"></line>
+<line x1="50" x2="50" y1="10" y2="14"></line>
+<line x1="64.1" x2="62.1" y1="17.5" y2="20.9"></line>
+<line x1="80" x2="76.6" y1="30.4" y2="32.4"></line>
+<line x1="90" x2="86" y1="50" y2="50"></line>
+</g>
+<!-- Needle: rotate via --asset-angle (0deg = left, 180deg = right) -->
+<g id="needle" style="transform-origin:50px 50px; transform: rotate(var(--asset-angle, 90deg));">
+<line stroke="currentColor" stroke-linecap="round" stroke-width="2.5" x1="50" x2="50" y1="50" y2="18"></line>
+<circle cx="50" cy="50" fill="currentColor" r="4"></circle>
+</g>
+</svg>
+<div class="mt-2 text-center">
+<p class="font-display text-xl font-bold tracking-tight text-ink">Enter your price</p>
+<span class="mt-1 inline-flex items-center gap-1 rounded-full bg-raised px-2 py-0.5 text-xs font-medium text-muted">Your price • INR</span>
+</div>
+<p class="mt-4 text-xs leading-relaxed text-muted">Enter the price you want buyers to see. Kalakart does not invent market prices when there is not enough marketplace data.</p>
+<div class="mt-5 border-t border-line pt-5">
+<label class="mb-1.5 block text-xs font-medium text-muted">Your price</label>
+<div class="relative">
+<span class="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-medium text-muted">₹</span>
+<input @input="checkPrice()" class="w-full rounded-card border border-line bg-raised py-2.5 pl-7 pr-14 text-sm font-semibold tabular-nums text-ink focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent" type="text" x-model="finalPrice"/>
+<span class="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-medium text-muted">INR</span>
+</div>
+
+</div>
+</section>
+</div>
+</div>
+</main>
+<!-- Sticky footer controls -->
+<footer class="fixed bottom-0 left-60 right-0 z-30 border-t border-line bg-surface/95 backdrop-blur-sm">
+<div class="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
+<button @click="saveDraft()" class="flex items-center gap-2 rounded-card border border-line bg-surface px-5 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-raised">
+<iconify-icon class="text-base text-muted" icon="lucide:save"></iconify-icon>
+        Save draft
+      </button>
+<button :disabled="publishing" @click="publish()" class="flex items-center gap-2 rounded-card bg-accent px-6 py-2.5 text-sm font-semibold text-accentInk shadow-[0_1px_2px_rgba(22,29,26,0.10),0_4px_4px_rgba(22,29,26,0.09),0_9px_6px_rgba(22,29,26,0.05),0_17px_7px_rgba(22,29,26,0.01),inset_0_2px_8px_rgba(255,255,255,0.6)] transition-colors hover:bg-accent/90 disabled:opacity-60">
+<template x-if="!publishing">
+<span class="flex items-center gap-2">
+<iconify-icon class="text-base" icon="lucide:check-circle"></iconify-icon>
+            Publish product
+          </span>
+</template>
+<template x-if="publishing">
+<span class="flex items-center gap-2">
+<iconify-icon class="animate-spin text-base" icon="lucide:loader-2"></iconify-icon>
+            Publishing…
+          </span>
+</template>
+</button>
+</div>
+</footer>
+<!-- Success toast (inline, not fixed) -->
+<div class="mx-auto max-w-5xl px-6 pb-6" x-show="published" x-transition="">
+<div class="flex items-center gap-3 rounded-card border border-green-200 bg-green-50 px-4 py-3">
+<div class="grid h-9 w-9 place-items-center rounded-xl bg-raised text-ink">
+<iconify-icon class="text-base" icon="lucide:check"></iconify-icon>
+</div>
+<div>
+<p class="text-sm font-medium text-green-800">Your product is live. Buyers can find it under Home.</p>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+      </template>
+      <template x-if="dashTab === 'orders'">
+<div class="min-h-screen bg-base font-body text-ink"><div class="mx-auto max-w-7xl px-8 py-8">
+<div><p class="text-xs font-medium text-muted">Dashboard / Orders</p><h1 class="mt-1 font-display text-xl font-semibold">Orders & fulfilment</h1><p class="mt-1 text-sm text-muted">Orders linked to products owned by this account.</p></div>
+<div class="mt-6 grid grid-cols-2 gap-5 lg:grid-cols-4"><div class="rounded-card bg-surface p-5"><p class="text-xs text-muted">Orders</p><p class="mt-2 text-2xl font-display font-bold" x-text="myOrders.length"></p></div><div class="rounded-card bg-surface p-5"><p class="text-xs text-muted">Revenue</p><p class="mt-2 text-2xl font-display font-bold" x-text="formatINR(analytics.personal.revenue)"></p></div><div class="rounded-card bg-surface p-5"><p class="text-xs text-muted">Unique buyers</p><p class="mt-2 text-2xl font-display font-bold" x-text="analytics.personal.buyers"></p></div><div class="rounded-card bg-surface p-5"><p class="text-xs text-muted">Products</p><p class="mt-2 text-2xl font-display font-bold" x-text="myProducts.length"></p></div></div>
+<div class="mt-5 rounded-card bg-surface p-6 shadow-sm" x-show="myOrders.length"><div class="space-y-2"><template x-for="o in myOrders" :key="o.id"><div class="flex flex-wrap items-center gap-3 rounded-card bg-raised px-4 py-3"><div class="min-w-0 flex-1"><p class="text-sm font-semibold" x-text="o.product_title"></p><p class="text-xs text-muted" x-text="o.id + ' · ' + new Date(o.created_at).toLocaleString()"></p></div><span class="rounded-full bg-white px-2 py-1 text-xs" x-text="o.status"></span><span class="font-mono text-sm" x-text="formatINR(o.total)"></span></div></template></div></div>
+<div x-show="!myOrders.length" class="mt-5 rounded-card border border-dashed border-line bg-surface p-10 text-center"><p class="text-sm font-medium">No orders yet</p><p class="mt-1 text-xs text-muted">Orders, buyers and revenue remain 0 until real buyer checkout creates an order.</p></div>
+</div></div>
+</template><template x-if="dashTab === 'products'">
+<div class="min-h-screen bg-base font-body text-ink"><div class="mx-auto max-w-7xl px-8 py-8">
+<div class="flex items-center justify-between"><div><p class="text-xs font-medium text-muted">Dashboard / My Products</p><h1 class="mt-1 font-display text-xl font-semibold">My products</h1><p class="mt-1 text-sm text-muted">Only products owned by your account are shown.</p></div><button @click="dashTab='add-product'" class="rounded-card bg-accent px-4 py-2 text-sm font-semibold text-white">Add product</button></div>
+<div class="mt-6 rounded-card bg-surface p-6 shadow-sm"><p class="text-3xl font-display font-bold" x-text="myProducts.length"></p><p class="text-sm text-muted">products</p></div>
+<div class="mt-5 overflow-hidden rounded-card border border-line bg-surface" x-show="myProducts.length"><table class="w-full text-left text-sm"><thead class="bg-raised text-xs text-muted"><tr><th class="px-4 py-3">Product</th><th class="px-4 py-3">Category</th><th class="px-4 py-3">Price</th><th class="px-4 py-3">Stock</th><th class="px-4 py-3">Created</th></tr></thead><tbody><template x-for="p in myProducts" :key="p.id"><tr class="border-t border-line"><td class="px-4 py-3 font-medium" x-text="p.title"></td><td class="px-4 py-3 text-muted" x-text="p.category"></td><td class="px-4 py-3 font-mono" x-text="formatINR(p.price)"></td><td class="px-4 py-3" x-text="p.stock"></td><td class="px-4 py-3 text-muted" x-text="new Date(p.created_at).toLocaleDateString()"></td></tr></template></tbody></table></div>
+<div x-show="!myProducts.length" class="mt-5 rounded-card border border-dashed border-line bg-surface p-10 text-center"><p class="text-sm font-medium">You have not added a product yet.</p><p class="mt-1 text-xs text-muted">The database correctly reports 0 products for a new artisan.</p></div>
+</div></div>
+</template><template x-if="dashTab === 'profile'">
+<div class="min-h-screen bg-base font-body text-ink"><div class="mx-auto max-w-4xl px-8 py-8"><h1 class="font-display text-xl font-semibold">Profile</h1><p class="mt-1 text-sm text-muted">Your account information from the users table.</p><div class="mt-6 rounded-card bg-surface p-6 shadow-sm"><div class="grid gap-5 sm:grid-cols-2"><div><p class="text-xs text-muted">Name</p><p class="mt-1 text-sm font-medium" x-text="user?.name"></p></div><div><p class="text-xs text-muted">Email</p><p class="mt-1 text-sm font-medium" x-text="user?.email"></p></div><div><p class="text-xs text-muted">Role</p><p class="mt-1 text-sm font-medium capitalize" x-text="user?.role"></p></div><div><p class="text-xs text-muted">Account created</p><p class="mt-1 text-sm font-medium" x-text="user?.created_at ? new Date(user.created_at).toLocaleString() : ''"></p></div></div></div><button @click="logout()" class="mt-5 rounded-card border border-line bg-surface px-4 py-2 text-sm font-medium">Logout</button></div></div>
+</template></main>
+  </div>
+</template>
+
+<script>
+
+function kalakartApp() {
+  return {
+    page: 'login',
+    dashTab: 'overview',
+    selectedProduct: 0,
+    lastOrder: null,
+    user: null,
+    token: localStorage.getItem('kalakart_token') || '',
+    authMode: 'login',
+    role: 'artisan',
+    email: '',
+    password: '',
+    name: '',
+    authError: '',
+    loading: false,
+    myProducts: [],
+    myOrders: [],
+    analytics: {
+      personal: {products:0, orders:0, buyers:0, revenue:0},
+      marketplace: {hasData:false, topCategories:[]}
+    },
+    assistantInput: '',
+    assistantBusy: false,
+    assistantMessages: [{role:'assistant', text:'Hi! Ask me about your products, orders, or marketplace data.'}],
+    messages: [],
+    unreadMessages: 0,
+    selectedMessageUserId: '',
+    selectedMessageName: '',
+    messageText: '',
+    messageSending: false,
+    messageError: '',
+    products: [],
+    marketSearch: '', marketCategory: 'All', marketSort: 'Newest first',
+    formatINR(n) { return '₹' + Number(n || 0).toLocaleString('en-IN'); },
+    async api(path, options={}) {
+      const headers = Object.assign({'Content-Type':'application/json'}, options.headers || {});
+      if (this.token) headers.Authorization = 'Bearer ' + this.token;
+      const res = await fetch(path, Object.assign({}, options, {headers}));
+      let data = {};
+      try { data = await res.json(); } catch (_) {}
+      if (!res.ok) throw new Error(data.error || 'Request failed');
+      return data;
+    },
+    async initApp() {
+      if (!this.token) return;
+      try {
+        const data = await this.api('/api/me');
+        this.user = data.user;
+        if (this.user.role === 'artisan') {
+          this.page='dashboard'; this.dashTab='overview'; await this.refreshDashboard();
+        } else {
+          this.page='browse'; await this.loadMarketplace();
+        }
+      } catch (_) {
+        this.token=''; localStorage.removeItem('kalakart_token');
+      }
+    },
+    async login() {
+      this.authError=''; this.loading=true;
+      try {
+        const data=await this.api('/api/auth/login',{method:'POST',body:JSON.stringify({email:this.email,password:this.password,role:this.role})});
+        this.token=data.token; localStorage.setItem('kalakart_token',this.token); this.user=data.user;
+        if (this.user.role==='artisan') { this.page='dashboard'; this.dashTab='overview'; await this.refreshDashboard(); }
+        else { this.page='browse'; await this.loadMarketplace(); }
+      } catch(e) { this.authError=e.message; }
+      finally { this.loading=false; }
+    },
+    async register() {
+      this.authError=''; this.loading=true;
+      try {
+        const data=await this.api('/api/auth/register',{method:'POST',body:JSON.stringify({name:this.name,email:this.email,password:this.password,role:this.role})});
+        this.token=data.token; localStorage.setItem('kalakart_token',this.token); this.user=data.user;
+        if (this.user.role==='artisan') { this.page='dashboard'; this.dashTab='overview'; await this.refreshDashboard(); }
+        else { this.page='browse'; await this.loadMarketplace(); }
+      } catch(e) { this.authError=e.message; }
+      finally { this.loading=false; }
+    },
+    async logout() {
+      try { await this.api('/api/auth/logout',{method:'POST'}); } catch (_) {}
+      this.token=''; this.user=null; localStorage.removeItem('kalakart_token'); this.page='login'; this.authMode='login'; this.email=''; this.password='';
+    },
+    async refreshDashboard() {
+      if (!this.user || this.user.role!=='artisan') return;
+      try {
+        const [a,p,o]=await Promise.all([this.api('/api/analytics'),this.api('/api/products?mine=true'),this.api('/api/orders?mine=true')]);
+        this.analytics=a; this.myProducts=p.products || []; this.myOrders=o.orders || []; await this.loadMessages();
+      } catch(e) { console.error(e); }
+    },
+    conversationList() {
+      const map={};
+      for(const m of this.messages){ const id=m.counterparty_id; if(id) map[id]={id,name:m.counterparty_name||'User',last:m.text||''}; }
+      return Object.values(map);
+    },
+    activeConversation() { return this.messages.filter(m=>m.counterparty_id===this.selectedMessageUserId); },
+    async loadMessages(userId='') {
+      if(!this.user) return;
+      try { const d=await this.api('/api/messages'+(userId?'?user_id='+encodeURIComponent(userId):'')); this.messages=d.messages||[]; this.unreadMessages=Number(d.unread||0); }
+      catch(e) { this.messageError=e.message; }
+    },
+    async openMessages(userId='', name='') {
+      if(!this.user){ this.page='login'; this.authError='Please sign in to use messages.'; return; }
+      this.page='messages'; this.messageError=''; this.selectedMessageUserId=userId||this.selectedMessageUserId; this.selectedMessageName=name||this.selectedMessageName;
+      await this.loadMessages(this.selectedMessageUserId);
+      if(this.selectedMessageUserId){ const c=this.conversationList().find(x=>x.id===this.selectedMessageUserId); if(c) this.selectedMessageName=c.name; }
+    },
+    async selectConversation(id) { const c=this.conversationList().find(x=>x.id===id); this.selectedMessageUserId=id; this.selectedMessageName=c?.name||'User'; this.messageError=''; await this.loadMessages(id); },
+    async sendMessage() {
+      const text=this.messageText.trim(); if(!text||!this.selectedMessageUserId||this.messageSending) return;
+      this.messageSending=true; this.messageError='';
+      try { await this.api('/api/messages',{method:'POST',body:JSON.stringify({recipient_id:this.selectedMessageUserId,text})}); this.messageText=''; await this.loadMessages(this.selectedMessageUserId); }
+      catch(e) { this.messageError=e.message; } finally { this.messageSending=false; }
+    },
+    async messageArtisan(product) {
+      if(!this.user){ this.page='login'; this.role='buyer'; this.authMode='login'; this.authError='Sign in as a buyer to message the artisan.'; return; }
+      if(this.user.role!=='buyer'){ this.page='messages'; return; }
+      this.selectedMessageUserId=product.owner_id; this.selectedMessageName=product.artisan||'Artisan'; this.messageText=''; this.messageError=''; this.page='messages'; await this.loadMessages(product.owner_id);
+    },
+    async loadMarketplace() {
+      try { const d=await this.api('/api/products'); this.products=d.products || []; } catch(e) { console.error(e); }
+    },
+    async askAssistant() {
+      const q=this.assistantInput.trim(); if(!q || this.assistantBusy) return;
+      this.assistantMessages.push({role:'user',text:q}); this.assistantInput=''; this.assistantBusy=true;
+      try {
+        const d=await this.api('/api/ai/assistant',{method:'POST',body:JSON.stringify({question:q})});
+        this.assistantMessages.push({role:'assistant',text:d.answer});
+      } catch(e) { this.assistantMessages.push({role:'assistant',text:e.message}); }
+      finally { this.assistantBusy=false; }
+    },
+    visibleProducts() {
+      const q=this.marketSearch.trim().toLowerCase();
+      let list=this.products.filter(p => (this.marketCategory==='All' || p.category===this.marketCategory) && (!q || [p.title,p.description,p.category,(p.tags||[]).join(' ')].join(' ').toLowerCase().includes(q)));
+      if(this.marketSort==='Price: low to high') list.sort((a,b)=>Number(a.price)-Number(b.price));
+      else if(this.marketSort==='Price: high to low') list.sort((a,b)=>Number(b.price)-Number(a.price));
+      else list.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+      return list;
+    },
+    selectProduct(i) { this.selectedProduct=i; this.page='product-detail'; window.scrollTo(0,0); },
+    selectProductById(id) { const i=this.products.findIndex(p=>p.id===id); if(i>=0) this.selectProduct(i); },
+    startMarketplaceVoiceSearch() {
+      const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+      if(!SR) { alert('Voice search is not supported in this browser. Try Chrome or Edge.'); return; }
+      const r=new SR(); r.lang='en-IN'; r.continuous=false; r.interimResults=false; r.onresult=e=>{this.marketSearch=e.results[0][0].transcript;}; r.start();
+    },
+    isSaved(product) { return JSON.parse(localStorage.getItem('kalakart_saved_products') || '[]').includes(product?.id); },
+    saveProduct(product) { const key='kalakart_saved_products'; const list=JSON.parse(localStorage.getItem(key)||'[]'); const next=list.includes(product.id)?list.filter(x=>x!==product.id):[...list,product.id]; localStorage.setItem(key,JSON.stringify(next)); },
+    async shareProduct(product) { const text=product?.title || 'Kalakart craft'; try { if(navigator.share) await navigator.share({title:text,text:'Discover this handmade product on Kalakart.'}); else await navigator.clipboard.writeText(text); } catch(_){} },
+    async placeOrder(product) {
+      if (!this.token || !this.user) { this.page='login'; this.authMode='login'; this.role='buyer'; this.authError='Sign in as a buyer to place an order.'; return; }
+      try {
+        const d=await this.api('/api/orders',{method:'POST',body:JSON.stringify({product_id:product.id})});
+        this.lastOrder=d.order; this.page='order-confirmation'; window.scrollTo(0,0);
+      } catch(e) { alert(e.message); }
+    },
+    openDashboard() {
+      if (this.user?.role==='artisan') { this.page='dashboard'; this.dashTab='overview'; this.refreshDashboard(); }
+      else { this.page='login'; this.role='artisan'; this.authMode='login'; }
+    }
+  };
+}
+
+function addProduct() {
+  return {
+    draftState: 'saved', voiceState: 'ready', generating: false, publishing: false, published: false,
+    editingTranscript: false, uploadError: false, uploadErrorMsg: '', voiceError: false,
+    priceWarning: false, finalPrice: '', stock: 1, materials: '', transcript: '', title: '', description: '', category: 'Home',
+    newTag: '', tags: [], photos: [], aiVision: '', aiBusy: false, voiceLanguage: 'en-IN',
+    recognition: null,
+    async api(path, options={}) {
+      const headers=Object.assign({'Content-Type':'application/json'},options.headers||{});
+      const token=localStorage.getItem('kalakart_token'); if(token) headers.Authorization='Bearer '+token;
+      const res=await fetch(path,Object.assign({},options,{headers})); let data={}; try{data=await res.json()}catch(_){}
+      if(!res.ok) throw new Error(data.error||'Request failed'); return data;
+    },
+    toggleMic() {
+      const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+      if(!SR) { this.voiceError=true; this.voiceState='ready'; this.transcript='Speech recognition is not supported in this browser. Try Chrome or Edge.'; return; }
+      if(this.voiceState==='listening') { try{this.recognition?.stop()}catch(_){}; return; }
+      this.voiceError=false; this.voiceState='listening';
+      const r=new SR(); this.recognition=r; r.lang=this.voiceLanguage; r.continuous=false; r.interimResults=true;
+      let finalText=this.transcript && !this.transcript.includes('Speech recognition') ? this.transcript.trim()+' ' : '';
+      r.onresult=(e)=>{ let interim=''; for(let i=e.resultIndex;i<e.results.length;i++){const s=e.results[i][0].transcript; if(e.results[i].isFinal) finalText+=s+' '; else interim+=s;} this.transcript=(finalText+interim).trim(); };
+      r.onerror=()=>{this.voiceError=true;this.voiceState='ready';};
+      r.onend=()=>{this.voiceState=this.transcript.trim()?'done':'ready';};
+      try{r.start()}catch(_){this.voiceState='ready';}
+    },
+    resetVoice(){ this.voiceState='ready'; this.transcript=''; },
+    async identifyImage() {
+      if(!this.photos.length) { this.aiVision='Upload a product photo first.'; return; }
+      this.aiBusy=true; this.aiVision='';
+      try { const d=await this.api('/api/ai/identify',{method:'POST',body:JSON.stringify({image:this.photos[0].src})}); this.aiVision=d.result || 'No identification returned.'; }
+      catch(e){this.aiVision=e.message;}
+      finally{this.aiBusy=false;}
+    },
+    async generateListing() {
+      if(!this.transcript.trim() && !this.photos.length) { this.voiceError=true; this.aiVision='Add a photo or describe the product by voice/text first.'; return; }
+      this.voiceError=false; this.generating=true;
+      try {
+        const d=await this.api('/api/ai/listing',{method:'POST',body:JSON.stringify({image:this.photos[0]?.src||null, transcript:this.transcript, vision:this.aiVision})});
+        this.title=d.title||this.title; this.description=d.description||this.description; this.category=d.category||this.category;
+        this.tags=Array.isArray(d.tags)?d.tags:this.tags; this.materials=d.materials||this.materials; if(d.price) this.finalPrice=String(d.price);
+      } catch(e){ this.aiVision=e.message; }
+      finally{this.generating=false;}
+    },
+    removePhoto(i){this.photos.splice(i,1);},
+    removeTag(i){this.tags.splice(i,1);},
+    addTag(){const x=(this.newTag||'').trim();if(x)this.tags.push(x);this.newTag='';},
+    handleFiles(fileList){
+      const files=Array.from(fileList||[]);
+      for(const file of files){
+        if(this.photos.length>=6)break;
+        if(!file.type.startsWith('image/'))continue;
+        if(file.size>8*1024*1024){this.uploadErrorMsg=`"${file.name}" is too large. Please use a photo under 8 MB.`;this.uploadError=true;continue;}
+        const reader=new FileReader(); reader.onload=e=>this.photos.push({src:e.target.result,name:file.name}); reader.readAsDataURL(file);
+      }
+    },
+    checkPrice(){ this.priceWarning=false; },
+    saveDraft(){ localStorage.setItem('kalakart_product_draft', JSON.stringify({title:this.title,description:this.description,category:this.category,tags:this.tags,price:this.finalPrice,stock:this.stock,transcript:this.transcript})); this.draftState='saving'; setTimeout(()=>this.draftState='saved',600); },
+    async publish(){
+      if(!this.title.trim()){this.aiVision='Please add a product title.';return;}
+      const price=parseFloat(String(this.finalPrice).replace(/[^0-9.]/g,''))||0;
+      if(price<=0){this.aiVision='Please enter a valid price before publishing.';return;}
+      this.publishing=true;
+      try{
+        await this.api('/api/products',{method:'POST',body:JSON.stringify({
+          title:this.title,description:this.description,category:this.category,tags:this.tags,price,
+          stock:Math.max(1, parseInt(this.stock,10)||1),image_url:this.photos[0]?.src||null,materials:this.materials,voice_transcript:this.transcript
+        })});
+        this.published=true;
+        this.$dispatch('refresh-dashboard');
+        if(window.Alpine?.$data) { /* no-op: parent dashboard refresh occurs on tab change */ }
+        setTimeout(()=>{this.published=false; this.title='';this.description='';this.tags=[];this.photos=[];this.transcript='';this.finalPrice='';this.stock=1;this.materials='';this.aiVision='';},800);
+      }catch(e){this.aiVision=e.message;}
+      finally{this.publishing=false;}
+    }
+  };
+}
+
+
+
+
+</script>
+</body>
+</html>
